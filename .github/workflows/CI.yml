@@ -34,7 +34,7 @@ jobs:
 
       # Checkstyle 리포트 업로드
       - name: Upload Checkstyle Report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: checkstyle-report
           path: StockAssistPlatform/build/reports/checkstyle/*.html
