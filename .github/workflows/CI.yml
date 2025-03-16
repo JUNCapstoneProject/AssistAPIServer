@@ -32,6 +32,13 @@ jobs:
       - name: Run Lint Check (Checkstyle)
         run: ./gradlew checkstyleMain checkstyleTest --no-daemon
 
+      # Checkstyle 리포트 업로드
+      - name: Upload Checkstyle Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: checkstyle-report
+          path: StockAssistPlatform/build/reports/checkstyle/*.html
+
       - name: Run Tests
         run: ./gradlew test --no-daemon
 
