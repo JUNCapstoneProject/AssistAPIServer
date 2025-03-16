@@ -1,0 +1,29 @@
+name: AssistAPIServer_CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin  # OpenJDK의 한 배포판
+          java-version: '21'
+          cache: maven
+
+      # Maven의 Checkstyle 플러그인을 사용해 코드 스타일 및 린트 검사를 진행
+      - name: Run Lint Check (Checkstyle)
+        run: mvn checkstyle:check
+
+      - name: Run Tests
+        run: mvn test
