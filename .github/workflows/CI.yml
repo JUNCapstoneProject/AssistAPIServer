@@ -28,10 +28,6 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      # dos2unix로 줄바꿈 자동 처리 (CRLF -> LF)
-      - name: Convert line endings to LF
-        run: find . -type f -exec dos2unix {} \;
-
       # Gradle의 Checkstyle 플러그인을 사용해 코드 스타일 및 린트 검사를 진행
       - name: Run Lint Check (Checkstyle)
         run: ./gradlew checkstyleMain checkstyleTest --no-daemon
