@@ -14,16 +14,27 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set up JDK 21
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: temurin  # OpenJDK의 한 배포판
-          java-version: '21'
-          cache: maven
+          java-version: '17.0.12'
+          cache: gradle
 
-      # Maven의 Checkstyle 플러그인을 사용해 코드 스타일 및 린트 검사를 진행
+      # Gradle Wrapper 실행 권한 추가
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # dos2unix로 줄바꿈 자동 처리 (CRLF -> LF)
+      - name: Convert line endings to LF
+        run: find . -type f -exec dos2unix {} \;
+
+      # Gradle의 Checkstyle 플러그인을 사용해 코드 스타일 및 린트 검사를 진행
       - name: Run Lint Check (Checkstyle)
-        run: mvn checkstyle:check
+        run: ./gradlew checkstyleMain checkstyleTest --no-daemon
 
       - name: Run Tests
-        run: mvn test
+        run: ./gradlew test --no-daemon
+
+      - name: Clean Build Cache
+        run: ./gradlew clean --no-daemon
