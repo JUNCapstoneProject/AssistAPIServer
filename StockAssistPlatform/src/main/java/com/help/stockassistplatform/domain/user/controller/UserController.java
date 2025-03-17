@@ -9,6 +9,7 @@ import com.help.stockassistplatform.common.response.ApiResponse;
 import com.help.stockassistplatform.domain.user.dto.SignupRequest;
 import com.help.stockassistplatform.domain.user.service.UserService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -19,7 +20,7 @@ public class UserController {
 
 	// 회원가입 요청
 	@PostMapping("/auth/register")
-	public ApiResponse<?> signup(@RequestBody final SignupRequest request) {
+	public ApiResponse<?> signup(@Valid @RequestBody final SignupRequest request) {
 		userService.registerUser(request);
 		return ApiResponse.success(null);
 	}

@@ -5,12 +5,12 @@ import lombok.Data;
 
 @Data
 public class SignupRequest {
-	@NotBlank
+	@NotBlank(message = "이메일을 입력해주세요")
 	private String email;
 
-	@NotBlank
+	@NotBlank(message = "비밀번호를 입력해주세요")
 	private String password;
 
-	@NotBlank
+	@NotBlank(message = "닉네임을 입력해주세요")
 	private String nickname;
 }
