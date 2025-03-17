@@ -1,5 +1,6 @@
 package com.help.stockassistplatform.domain.user.service;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,12 +15,14 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class UserService {
 	private final UserRepository userRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
 	public void registerUser(final SignupRequest request) {
+		final String encodedPassword = passwordEncoder.encode(request.getPassword());
 		final User user = User.builder()
 			.email(request.getEmail())
-			.password(request.getPassword())
+			.password(encodedPassword)
 			.nickname(request.getNickname())
 			.build();
 		userRepository.save(user);
