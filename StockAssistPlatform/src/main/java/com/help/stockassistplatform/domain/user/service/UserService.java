@@ -1,6 +1,7 @@
 package com.help.stockassistplatform.domain.user.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.help.stockassistplatform.domain.user.dto.SignupRequest;
 import com.help.stockassistplatform.domain.user.entity.User;
@@ -13,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class UserService {
 	private final UserRepository userRepository;
 
+	@Transactional
 	public void registerUser(final SignupRequest request) {
 		final User user = User.builder()
 			.email(request.getEmail())
