@@ -41,7 +41,7 @@ public class User {
 	@Column(nullable = false)
 	private UserRole role = UserRole.USER;
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false, length = 10)
 	private String nickname;
 
 	@Column(nullable = false, updatable = false)
