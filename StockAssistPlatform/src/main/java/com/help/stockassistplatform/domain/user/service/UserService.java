@@ -10,6 +10,7 @@ import com.help.stockassistplatform.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class UserService {
 	private final UserRepository userRepository;
