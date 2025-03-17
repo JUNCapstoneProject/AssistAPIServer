@@ -21,6 +21,7 @@ public class UserController {
 	// 회원가입 요청
 	@PostMapping("/auth/register")
 	public ApiResponse<?> signup(@Valid @RequestBody final SignupRequest request) {
+		userService.validateDuplicateEmail(request.getEmail());
 		userService.registerUser(request);
 		return ApiResponse.success(null);
 	}
