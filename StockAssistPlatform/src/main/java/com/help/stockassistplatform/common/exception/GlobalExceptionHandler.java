@@ -49,6 +49,6 @@ public class GlobalExceptionHandler {
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ApiResponse<?> unknownServerError(final RuntimeException e) {
 		log.error("서버 오류 : {}", e.getMessage());
-		return ApiResponse.error("e.getMessage()", HttpStatus.INTERNAL_SERVER_ERROR);
+		return ApiResponse.error(String.valueOf(ErrorCode.INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 }
