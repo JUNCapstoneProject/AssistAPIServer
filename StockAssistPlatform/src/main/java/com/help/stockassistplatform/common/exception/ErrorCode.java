@@ -15,7 +15,7 @@ public enum ErrorCode {
 		this.status = status;
 		this.message = message;
 	}
-	
+
 	@Override
 	public String toString() {
 		return message;
