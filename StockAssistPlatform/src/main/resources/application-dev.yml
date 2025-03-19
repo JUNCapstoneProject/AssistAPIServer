@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: jdbc:mysql://assist-api-server-dev.mysql.database.azure.com/help
+    username: assist_api_superuser
+    password: qd@5z2!xaF
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        show_sql: true
+    hibernate:
+      ddl-auto: update
