@@ -13,13 +13,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class UserController {
+public class AuthController {
 	private final UserService userService;
 
 	// 회원가입 요청
-	@PostMapping("/auth/register")
+	@PostMapping("/register")
 	public ApiResponse<?> signup(@Valid @RequestBody final SignupRequest request) {
 		userService.validateDuplicateEmail(request.getEmail());
 		userService.registerUser(request);
