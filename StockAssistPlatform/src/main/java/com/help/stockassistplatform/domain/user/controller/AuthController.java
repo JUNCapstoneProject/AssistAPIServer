@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.help.stockassistplatform.common.response.ApiResponse;
 import com.help.stockassistplatform.domain.user.dto.SignupRequest;
 import com.help.stockassistplatform.domain.user.service.AuthTokenService;
+import com.help.stockassistplatform.domain.user.service.EmailService;
 import com.help.stockassistplatform.domain.user.service.UserService;
 
 import jakarta.validation.Valid;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 public class AuthController {
 	private final UserService userService;
 	private final AuthTokenService authTokenService;
+	private final EmailService emailService;
 
 	// 회원가입 요청
 	@PostMapping("/register")
@@ -28,7 +30,7 @@ public class AuthController {
 		userService.validateDuplicateEmail(request.getEmail());
 		final String token = authTokenService.createToken();
 		authTokenService.saveUserInfoToRedis(token, request);
-		// TODO: userService.sendVerificationEmail(token, request.getEmail());
+		emailService.sendVerificationEmail(token, request.getEmail());
 		return ApiResponse.success(null);
 	}
 
