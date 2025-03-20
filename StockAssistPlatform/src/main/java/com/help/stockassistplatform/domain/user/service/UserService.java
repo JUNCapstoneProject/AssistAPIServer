@@ -20,12 +20,12 @@ public class UserService {
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
-	public void registerUser(final SignupRequest request) {
-		final String encodedPassword = passwordEncoder.encode(request.getPassword());
+	public void registerUser(final SignupRequest userInfo) {
+		final String encodedPassword = passwordEncoder.encode(userInfo.getPassword());
 		final User user = User.builder()
-			.email(request.getEmail())
+			.email(userInfo.getEmail())
 			.password(encodedPassword)
-			.nickname(request.getNickname())
+			.nickname(userInfo.getNickname())
 			.build();
 		userRepository.save(user);
 	}
