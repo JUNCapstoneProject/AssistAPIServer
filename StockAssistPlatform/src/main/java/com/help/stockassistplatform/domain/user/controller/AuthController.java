@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.help.stockassistplatform.common.response.ApiResponse;
 import com.help.stockassistplatform.domain.user.dto.SignupRequest;
 import com.help.stockassistplatform.domain.user.service.AuthTokenService;
 import com.help.stockassistplatform.domain.user.service.EmailService;
 import com.help.stockassistplatform.domain.user.service.UserService;
+import com.help.stockassistplatform.global.common.response.ApiResponse;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

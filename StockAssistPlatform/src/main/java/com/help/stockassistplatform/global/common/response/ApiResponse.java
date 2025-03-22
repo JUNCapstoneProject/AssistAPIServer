@@ -1,4 +1,4 @@
-package com.help.stockassistplatform.common.response;
+package com.help.stockassistplatform.global.common.response;
 
 import org.springframework.http.HttpStatusCode;
 

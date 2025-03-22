@@ -9,9 +9,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.help.stockassistplatform.common.exception.CustomException;
-import com.help.stockassistplatform.common.exception.ErrorCode;
 import com.help.stockassistplatform.domain.user.dto.SignupRequest;
+import com.help.stockassistplatform.global.common.exception.CustomException;
+import com.help.stockassistplatform.global.common.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

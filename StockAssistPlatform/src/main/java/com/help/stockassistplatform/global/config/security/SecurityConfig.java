@@ -1,4 +1,4 @@
-package com.help.stockassistplatform.config.security;
+package com.help.stockassistplatform.global.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

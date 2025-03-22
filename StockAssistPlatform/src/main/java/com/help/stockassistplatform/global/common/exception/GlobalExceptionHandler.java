@@ -1,4 +1,4 @@
-package com.help.stockassistplatform.common.exception;
+package com.help.stockassistplatform.global.common.exception;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.help.stockassistplatform.common.response.ApiResponse;
+import com.help.stockassistplatform.global.common.response.ApiResponse;
 
 import lombok.extern.slf4j.Slf4j;
 

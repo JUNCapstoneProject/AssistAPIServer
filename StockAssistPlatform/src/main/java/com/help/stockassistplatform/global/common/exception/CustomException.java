@@ -1,4 +1,4 @@
-package com.help.stockassistplatform.common.exception;
+package com.help.stockassistplatform.global.common.exception;
 
 public class CustomException extends RuntimeException {
 	private final ErrorCode errorCode;

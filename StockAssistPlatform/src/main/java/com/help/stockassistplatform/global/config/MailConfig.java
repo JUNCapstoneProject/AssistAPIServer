@@ -1,4 +1,4 @@
-package com.help.stockassistplatform.config;
+package com.help.stockassistplatform.global.config;
 
 import java.util.Properties;
 
