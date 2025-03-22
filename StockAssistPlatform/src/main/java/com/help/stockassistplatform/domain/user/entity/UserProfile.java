@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
-@ToString
+@ToString(exclude = "user")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "user_profile")
 @Entity

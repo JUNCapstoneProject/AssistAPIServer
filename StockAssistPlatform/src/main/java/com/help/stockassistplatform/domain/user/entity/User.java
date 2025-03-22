@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
-@ToString
+@ToString(exclude = "userProfile")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "user_entity")
 @EntityListeners(AuditingEntityListener.class)
