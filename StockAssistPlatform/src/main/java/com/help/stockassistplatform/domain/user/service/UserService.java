@@ -11,9 +11,11 @@ import com.help.stockassistplatform.domain.user.entity.User;
 import com.help.stockassistplatform.domain.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 @Service
 public class UserService {
 	private final UserRepository userRepository;
@@ -27,6 +29,7 @@ public class UserService {
 			.password(encodedPassword)
 			.nickname(userInfo.getNickname())
 			.build();
+		log.info("User registered: {}", user);
 		userRepository.save(user);
 	}
 
