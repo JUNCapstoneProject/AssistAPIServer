@@ -12,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.help.stockassistplatform.global.common.response.ApiResponse;
 
@@ -34,6 +35,14 @@ public class GlobalExceptionHandler {
 		return ResponseEntity
 			.status(HttpStatus.BAD_REQUEST)
 			.body(ApiResponse.error(ErrorCode.INVALID_CREDENTIALS));
+	}
+
+	@ExceptionHandler(NoHandlerFoundException.class)
+	public ResponseEntity<ApiResponse<?>> handleNoHandlerFoundException(final NoHandlerFoundException ex) {
+		log.error("NoHandlerFoundException : {}", ex.getMessage());
+		return ResponseEntity
+			.status(HttpStatus.NOT_FOUND)
+			.body(ApiResponse.error(ErrorCode.NOT_FOUND));
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
