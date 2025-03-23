@@ -58,8 +58,10 @@ public class JwtUtil {
 		return TOKEN_PREFIX + accessToken;
 	}
 
-	String createRefreshToken() {
+	String createRefreshToken(final CustomUser user) {
 		return Jwts.builder()
+			.claim("username", user.getUsername())
+			.subject(REFRESH_TOKEN)
 			.issuedAt(new Date(System.currentTimeMillis()))
 			.expiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXP))
 			.signWith(secretKey)
@@ -107,6 +109,15 @@ public class JwtUtil {
 		return Optional.ofNullable(request.getHeader(ACCESS_HEADER))
 			.filter(accessToken -> accessToken.startsWith(TOKEN_PREFIX))
 			.map(accessToken -> accessToken.substring(TOKEN_PREFIX.length()));
+	}
+
+	public ResponseCookie createExpiredRefreshTokenCookie() {
+		return ResponseCookie.from(REFRESH_TOKEN, "")
+			.httpOnly(true)
+			.secure(true)
+			.path("/")
+			.maxAge(0L) // 쿠키 즉시 만료
+			.build();
 	}
 
 	private Claims parseToken(final String token) {

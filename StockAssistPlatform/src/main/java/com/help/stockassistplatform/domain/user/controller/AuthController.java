@@ -15,6 +15,7 @@ import com.help.stockassistplatform.global.common.response.ApiResponse;
 import com.help.stockassistplatform.global.jwt.LoginService;
 import com.help.stockassistplatform.global.jwt.LoginUserDto;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,18 @@ public class AuthController {
 	public ApiResponse<?> login(@RequestBody final LoginUserDto loginUserDto, final
 	HttpServletResponse response) {
 		return loginService.login(loginUserDto, response);
+	}
+
+	@PostMapping("/refresh")
+	public ApiResponse<?> refresh(HttpServletRequest request, HttpServletResponse response) {
+		return loginService.refresh(request, response);
+	}
+
+	// 로그아웃
+	@PostMapping("/logout")
+	public ApiResponse<?> logout(final HttpServletResponse response) {
+		loginService.logout(response);
+		return ApiResponse.success(null);
 	}
 
 	// 테스트용
