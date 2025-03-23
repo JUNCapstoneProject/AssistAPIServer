@@ -8,6 +8,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -45,6 +46,16 @@ public class GlobalExceptionHandler {
 			.body(ApiResponse.error(ErrorCode.NOT_FOUND));
 	}
 
+	@ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+	public ResponseEntity<ApiResponse<?>> handleHttpRequestMethodNotSupportedException(
+		final HttpRequestMethodNotSupportedException ex
+	) {
+		log.error("HttpRequestMethodNotSupportedException : {}", ex.getMessage());
+		return ResponseEntity
+			.status(HttpStatus.METHOD_NOT_ALLOWED)
+			.body(ApiResponse.error(ErrorCode.NOT_FOUND));
+	}
+	
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiResponse<?>> handleValidationException(final MethodArgumentNotValidException ex) {
 		log.error("MethodArgumentNotValidException : {}", ex.getMessage());
