@@ -8,6 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.PatternMatchUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.help.stockassistplatform.domain.user.entity.User;
@@ -24,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-	private static final String NO_CHECK_URL = "/api/auth/login";
+	private static final String[] NO_CHECK_URL = {"/", "/api/auth/*"};
 
 	private final JwtUtil jwtUtil;
 	private final UserRepository userRepository;
@@ -34,11 +35,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		@NonNull final HttpServletRequest request,
 		@NonNull final HttpServletResponse response,
 		@NonNull final FilterChain filterChain) throws ServletException, IOException {
-		// "/api/login" 요청은 토큰 확인 x
-		if (request.getRequestURI().equals(NO_CHECK_URL)) {
+		final String requestURI = request.getRequestURI();
+
+		if (PatternMatchUtils.simpleMatch(NO_CHECK_URL, requestURI)) {
 			filterChain.doFilter(request, response);
 			return;
 		}
+		log.info("인증 필터 시작: {}", requestURI);
 		checkAccessTokenAndAuthentication(request, response, filterChain);
 	}
 
@@ -63,6 +66,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			);
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		log.info("Security Context에 '{}' 인증 정보를 저장했습니다.", myUser.getUsername());
+		log.info("Security Context에 '{}' 인증 정보를 저장", myUser.getUsername());
 	}
 }
