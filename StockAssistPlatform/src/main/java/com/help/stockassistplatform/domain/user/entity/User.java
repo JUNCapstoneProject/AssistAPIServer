@@ -34,14 +34,14 @@ public class User {
 	private Long userId;
 
 	@Column(nullable = false, unique = true)
-	private String email;
+	private String username;
 
 	@Column(nullable = false)
 	private String password;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private UserRole role = UserRole.USER;
+	private UserRole role = UserRole.ROLE_USER;
 
 	@Column(nullable = false, updatable = false)
 	@CreatedDate
@@ -51,9 +51,9 @@ public class User {
 	private UserProfile userProfile;
 
 	@Builder
-	public User(final String email, final String password, final String nickname) {
-		this.email = email;
+	public User(final String username, final String password, final String nickname) {
+		this.username = username;
 		this.password = password;
-		userProfile = new UserProfile(this, email, nickname);
+		userProfile = new UserProfile(this, username, nickname);
 	}
 }
