@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -24,7 +25,15 @@ public class GlobalExceptionHandler {
 		log.error("UsernameNotFoundException : {}", ex.getMessage());
 		return ResponseEntity
 			.status(HttpStatus.BAD_REQUEST)
-			.body(ApiResponse.error(ex.getMessage(), HttpStatus.BAD_REQUEST));
+			.body(ApiResponse.error(ErrorCode.INVALID_CREDENTIALS));
+	}
+
+	@ExceptionHandler(BadCredentialsException.class)
+	public ResponseEntity<ApiResponse<?>> handleBadCredentialsException(final BadCredentialsException ex) {
+		log.error("BadCredentialsException : {}", ex.getMessage());
+		return ResponseEntity
+			.status(HttpStatus.BAD_REQUEST)
+			.body(ApiResponse.error(ErrorCode.INVALID_CREDENTIALS));
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)

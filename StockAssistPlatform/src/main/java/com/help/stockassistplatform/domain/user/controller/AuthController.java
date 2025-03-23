@@ -12,7 +12,10 @@ import com.help.stockassistplatform.domain.user.service.AuthTokenService;
 import com.help.stockassistplatform.domain.user.service.EmailService;
 import com.help.stockassistplatform.domain.user.service.UserService;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
+import com.help.stockassistplatform.global.jwt.LoginService;
+import com.help.stockassistplatform.global.jwt.LoginUserDto;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +26,7 @@ public class AuthController {
 	private final UserService userService;
 	private final AuthTokenService authTokenService;
 	private final EmailService emailService;
+	private final LoginService loginService;
 
 	// 회원가입 요청
 	@PostMapping("/register")
@@ -34,11 +38,29 @@ public class AuthController {
 		return ApiResponse.success(null);
 	}
 
-	// 프론트에서 보낸 토큰 정보를 바탕으로 유저 회원가입 처리
+	// 토큰 정보를 바탕으로 유저 회원가입 처리
 	@GetMapping("/verify")
 	public ApiResponse<?> verify(@RequestParam final String token) {
 		final SignupRequest userInfo = authTokenService.getUserInfoFromRedis(token);
 		userService.registerUser(userInfo);
 		return ApiResponse.success(null);
 	}
+
+	// 로그인 TODO: loginSuccessHandler migration
+	@PostMapping("/login")
+	public ApiResponse<?> login(@RequestBody final LoginUserDto loginUserDto, final
+	HttpServletResponse response) {
+		return loginService.login(loginUserDto, response);
+	}
+
+	// 테스트용
+	// @GetMapping("/me")
+	// public ApiResponse<?> getMyProfile(@AuthenticationPrincipal CustomUser userDetails,
+	// 	final HttpServletResponse request) {
+	// 	if (userDetails == null) {
+	// 		return ApiResponse.error(ErrorCode.UNAUTHORIZED);
+	// 	}
+	//
+	// 	return ApiResponse.success(userDetails);
+	// }
 }
