@@ -25,7 +25,7 @@ public class UserService {
 	public void registerUser(final SignupRequest userInfo) {
 		final String encodedPassword = passwordEncoder.encode(userInfo.getPassword());
 		final User user = User.builder()
-			.email(userInfo.getEmail())
+			.username(userInfo.getEmail())
 			.password(encodedPassword)
 			.nickname(userInfo.getNickname())
 			.build();
@@ -34,7 +34,7 @@ public class UserService {
 	}
 
 	public void validateDuplicateEmail(final String email) {
-		if (userRepository.existsByEmail(email)) {
+		if (userRepository.existsByUsername(email)) {
 			throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
 		}
 	}
