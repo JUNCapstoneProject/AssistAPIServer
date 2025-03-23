@@ -3,8 +3,8 @@ package com.help.stockassistplatform.global.common.exception;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -19,6 +19,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+	@ExceptionHandler(UsernameNotFoundException.class)
+	public ResponseEntity<ApiResponse<?>> handleUsernameNotFoundException(final UsernameNotFoundException ex) {
+		log.error("UsernameNotFoundException : {}", ex.getMessage());
+		return ResponseEntity
+			.status(HttpStatus.BAD_REQUEST)
+			.body(ApiResponse.error(ex.getMessage(), HttpStatus.BAD_REQUEST));
+	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiResponse<?>> handleValidationException(final MethodArgumentNotValidException ex) {
@@ -42,13 +49,13 @@ public class GlobalExceptionHandler {
 		final ErrorCode errorCode = ex.getErrorCode();
 		return ResponseEntity
 			.status(errorCode.getStatus())
-			.body(ApiResponse.error(errorCode.getMessage(), HttpStatusCode.valueOf(errorCode.getStatus())));
+			.body(ApiResponse.error(errorCode));
 	}
 
 	@ExceptionHandler(RuntimeException.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ApiResponse<?> unknownServerError(final RuntimeException ex) {
 		log.error("서버 오류 : {}", ex.getMessage());
-		return ApiResponse.error(String.valueOf(ErrorCode.INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
+		return ApiResponse.error(ErrorCode.INTERNAL_SERVER_ERROR);
 	}
 }
