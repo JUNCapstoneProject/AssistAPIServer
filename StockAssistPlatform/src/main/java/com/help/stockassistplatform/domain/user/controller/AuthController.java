@@ -13,6 +13,7 @@ import com.help.stockassistplatform.global.common.response.ApiResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -23,7 +24,7 @@ public class AuthController {
 
 	// 로그인
 	@PostMapping("/login")
-	public ApiResponse<?> login(@RequestBody final LoginRequestDto loginRequestDto, final
+	public ApiResponse<?> login(@Valid @RequestBody final LoginRequestDto loginRequestDto, final
 	HttpServletResponse response) {
 		return authService.login(loginRequestDto, response);
 	}
