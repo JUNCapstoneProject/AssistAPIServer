@@ -11,7 +11,8 @@ public enum ErrorCode {
 	INVALID_TOKEN(401, "유효하지 않은 토큰입니다"),
 	UNAUTHORIZED(401, "로그인이 필요합니다"),
 	INVALID_CREDENTIALS(401, "아이디나 비밀번호가 잘못되었습니다"),
-	NOT_FOUND(404, "페이지를 찾을 수 없습니다");
+	NOT_FOUND(404, "페이지를 찾을 수 없습니다"),
+	UNTRUSTED_EMAIL_SERVER(403, "신뢰할 수 없는 이메일 서버입니다");
 
 	private final int status;
 	private final String message;
