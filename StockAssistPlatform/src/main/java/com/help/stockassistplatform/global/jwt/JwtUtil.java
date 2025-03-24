@@ -72,7 +72,7 @@ public class JwtUtil {
 		try {
 			return !isTokenExpired(parseToken(token));
 		} catch (final JwtException e) {
-			log.error("JWT 토큰 검증 실패: ", e);
+			log.error("JWT 토큰 검증 실패: {}", e.getMessage());
 			return false;
 		}
 	}
