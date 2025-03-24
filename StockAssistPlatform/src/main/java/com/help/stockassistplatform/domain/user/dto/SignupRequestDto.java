@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class SignupRequest {
+public class SignupRequestDto {
 	@NotBlank(message = "이메일을 입력해주세요")
 	@Email(message = "올바른 이메일 형식으로 작성해주세요")
 	private String email;

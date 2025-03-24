@@ -41,7 +41,7 @@ public class JwtUtil {
 		secretKey = Keys.hmacShaKeyFor(keyBytes);
 	}
 
-	String createAccessToken(final CustomUser user) {
+	public String createAccessToken(final CustomUser user) {
 		final var authorities = user.getAuthorities()
 			.stream()
 			.map(GrantedAuthority::getAuthority)
@@ -58,7 +58,7 @@ public class JwtUtil {
 		return TOKEN_PREFIX + accessToken;
 	}
 
-	String createRefreshToken(final CustomUser user) {
+	public String createRefreshToken(final CustomUser user) {
 		return Jwts.builder()
 			.claim("username", user.getUsername())
 			.subject(REFRESH_TOKEN)
@@ -68,7 +68,7 @@ public class JwtUtil {
 			.compact();
 	}
 
-	boolean isTokenValidate(final String token) {
+	public boolean isTokenValidate(final String token) {
 		try {
 			return !isTokenExpired(parseToken(token));
 		} catch (final JwtException e) {
@@ -77,7 +77,7 @@ public class JwtUtil {
 		}
 	}
 
-	Optional<String> extractUsername(String token) {
+	public Optional<String> extractUsername(String token) {
 		try {
 			return Optional.ofNullable(parseToken(token).get("username", String.class));
 		} catch (final JwtException e) {
@@ -85,7 +85,7 @@ public class JwtUtil {
 		}
 	}
 
-	ResponseCookie createRefreshTokenCookie(final String refreshToken) {
+	public ResponseCookie createRefreshTokenCookie(final String refreshToken) {
 		return ResponseCookie.from(REFRESH_TOKEN, refreshToken)
 			.httpOnly(true)
 			.secure(true)
@@ -105,7 +105,7 @@ public class JwtUtil {
 		return Optional.empty();
 	}
 
-	Optional<String> extractAccessTokenFromRequest(final HttpServletRequest request) {
+	public Optional<String> extractAccessTokenFromRequest(final HttpServletRequest request) {
 		return Optional.ofNullable(request.getHeader(ACCESS_HEADER))
 			.filter(accessToken -> accessToken.startsWith(TOKEN_PREFIX))
 			.map(accessToken -> accessToken.substring(TOKEN_PREFIX.length()));

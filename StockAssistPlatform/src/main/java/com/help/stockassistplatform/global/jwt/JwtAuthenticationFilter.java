@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-	private static final String[] NO_CHECK_URL = {"/", "/api/auth/*"};
+	private static final String[] WHITE_LIST = {"/", "/api/auth/*"};
 
 	private final JwtUtil jwtUtil;
 	private final UserRepository userRepository;
@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		@NonNull final FilterChain filterChain) throws ServletException, IOException {
 		final String requestURI = request.getRequestURI();
 
-		if (PatternMatchUtils.simpleMatch(NO_CHECK_URL, requestURI)) {
+		if (PatternMatchUtils.simpleMatch(WHITE_LIST, requestURI)) {
 			filterChain.doFilter(request, response);
 			return;
 		}

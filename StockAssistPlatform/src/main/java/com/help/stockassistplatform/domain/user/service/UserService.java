@@ -4,7 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.help.stockassistplatform.domain.user.dto.SignupRequest;
+import com.help.stockassistplatform.domain.user.dto.SignupRequestDto;
 import com.help.stockassistplatform.domain.user.entity.User;
 import com.help.stockassistplatform.domain.user.repository.UserRepository;
 import com.help.stockassistplatform.global.common.exception.CustomException;
@@ -22,8 +22,9 @@ public class UserService {
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
-	public void registerUser(final SignupRequest userInfo) {
+	public void registerUser(final SignupRequestDto userInfo) {
 		final String encodedPassword = passwordEncoder.encode(userInfo.getPassword());
+		validateDuplicateEmail(userInfo.getEmail());
 		final User user = User.builder()
 			.username(userInfo.getEmail())
 			.password(encodedPassword)

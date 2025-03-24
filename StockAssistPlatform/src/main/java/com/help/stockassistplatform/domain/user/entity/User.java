@@ -41,7 +41,7 @@ public class User {
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private UserRole role = UserRole.ROLE_USER;
+	private UserRole role = UserRole.USER;
 
 	@Column(nullable = false, updatable = false)
 	@CreatedDate
