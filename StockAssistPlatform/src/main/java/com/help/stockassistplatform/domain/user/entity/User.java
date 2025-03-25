@@ -57,4 +57,8 @@ public class User {
 		this.password = password;
 		userProfile = new UserProfile(this, username, nickname);
 	}
+
+	public void updatePassword(final String newPassword) {
+		password = newPassword;
+	}
 }

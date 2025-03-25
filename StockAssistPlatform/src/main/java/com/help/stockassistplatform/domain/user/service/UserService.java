@@ -4,12 +4,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.help.stockassistplatform.domain.user.dto.request.PasswordChangeRequestDto;
 import com.help.stockassistplatform.domain.user.dto.request.ProfileUpdateRequestDto;
 import com.help.stockassistplatform.domain.user.dto.request.SignupRequestDto;
 import com.help.stockassistplatform.domain.user.entity.User;
 import com.help.stockassistplatform.domain.user.repository.UserRepository;
 import com.help.stockassistplatform.global.common.exception.CustomException;
 import com.help.stockassistplatform.global.common.exception.ErrorCode;
+import com.help.stockassistplatform.global.jwt.CustomUser;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,8 +38,17 @@ public class UserService {
 	}
 
 	@Transactional
-	public void updateUserPassword(final User user) {
-		userRepository.save(user);
+	public void updateUserPassword(
+		final CustomUser user,
+		final PasswordChangeRequestDto requestDto
+	) {
+		final User loginUser = userRepository.findByUsername(user.getUsername())
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+		if (!passwordEncoder.matches(requestDto.oldPassword(), loginUser.getPassword())) {
+			throw new CustomException(ErrorCode.INVALID_PASSWORD);
+		}
+		loginUser.updatePassword(passwordEncoder.encode(requestDto.newPassword()));
+		userRepository.save(loginUser);
 	}
 
 	@Transactional

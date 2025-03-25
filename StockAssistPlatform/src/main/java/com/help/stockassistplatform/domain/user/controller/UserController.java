@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.help.stockassistplatform.domain.user.dto.request.PasswordChangeRequestDto;
 import com.help.stockassistplatform.domain.user.dto.request.ProfileUpdateRequestDto;
 import com.help.stockassistplatform.domain.user.dto.response.ProfileResponseDto;
 import com.help.stockassistplatform.domain.user.entity.User;
@@ -50,6 +51,11 @@ public class UserController {
 	// 비밀번호 수정
 	@PreAuthorize("isAuthenticated()")
 	@PutMapping("/me/password")
-	public void updateUserPassword() {
+	public ApiResponse<?> updateUserPassword(
+		@AuthenticationPrincipal final CustomUser userDetail,
+		@Valid @RequestBody final PasswordChangeRequestDto requestDto
+	) {
+		userService.updateUserPassword(userDetail, requestDto);
+		return ApiResponse.success(null);
 	}
 }
