@@ -4,7 +4,11 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -26,7 +30,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiResponse<?>> handleUsernameNotFoundException(final UsernameNotFoundException ex) {
 		log.error("UsernameNotFoundException : {}", ex.getMessage());
 		return ResponseEntity
-			.status(HttpStatus.BAD_REQUEST)
+			.status(ErrorCode.INVALID_CREDENTIALS.getStatus())
 			.body(ApiResponse.error(ErrorCode.INVALID_CREDENTIALS));
 	}
 
@@ -34,7 +38,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiResponse<?>> handleBadCredentialsException(final BadCredentialsException ex) {
 		log.error("BadCredentialsException : {}", ex.getMessage());
 		return ResponseEntity
-			.status(HttpStatus.BAD_REQUEST)
+			.status(ErrorCode.INVALID_CREDENTIALS.getStatus())
 			.body(ApiResponse.error(ErrorCode.INVALID_CREDENTIALS));
 	}
 
@@ -42,7 +46,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiResponse<?>> handleNoHandlerFoundException(final NoHandlerFoundException ex) {
 		log.error("NoHandlerFoundException : {}", ex.getMessage());
 		return ResponseEntity
-			.status(HttpStatus.NOT_FOUND)
+			.status(ErrorCode.NOT_FOUND.getStatus())
 			.body(ApiResponse.error(ErrorCode.NOT_FOUND));
 	}
 
@@ -52,10 +56,26 @@ public class GlobalExceptionHandler {
 	) {
 		log.error("HttpRequestMethodNotSupportedException : {}", ex.getMessage());
 		return ResponseEntity
-			.status(HttpStatus.METHOD_NOT_ALLOWED)
+			.status(ErrorCode.NOT_FOUND.getStatus())
 			.body(ApiResponse.error(ErrorCode.NOT_FOUND));
 	}
-	
+
+	@ExceptionHandler(AuthorizationDeniedException.class)
+	public ResponseEntity<ApiResponse<?>> handleAuthorizationDeniedException(final AuthorizationDeniedException ex) {
+		final ErrorCode errorCode;
+		final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (null == authentication || authentication instanceof AnonymousAuthenticationToken) {
+			errorCode = ErrorCode.UNAUTHORIZED;
+		} else {
+			errorCode = ErrorCode.NOT_FOUND;
+		}
+		log.error("Access Denied : {}", errorCode.getMessage());
+
+		return ResponseEntity
+			.status(errorCode.getStatus())
+			.body(ApiResponse.error(errorCode));
+	}
+
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ApiResponse<?>> handleValidationException(final MethodArgumentNotValidException ex) {
 		log.error("MethodArgumentNotValidException : {}", ex.getMessage());
