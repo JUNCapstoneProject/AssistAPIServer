@@ -4,6 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.help.stockassistplatform.domain.user.dto.request.ProfileUpdateRequestDto;
 import com.help.stockassistplatform.domain.user.dto.request.SignupRequestDto;
 import com.help.stockassistplatform.domain.user.entity.User;
 import com.help.stockassistplatform.domain.user.repository.UserRepository;
@@ -30,13 +31,21 @@ public class UserService {
 			.password(encodedPassword)
 			.nickname(userInfo.getNickname())
 			.build();
-		log.info("User registered: {}", user);
 		userRepository.save(user);
+		log.info("User registered: {}", user);
 	}
 
 	@Transactional
 	public void updateUserPassword(final User user) {
 		userRepository.save(user);
+	}
+
+	@Transactional
+	public void updateUserProfile(final User loginUser, final ProfileUpdateRequestDto requestDto) {
+		loginUser.getUserProfile().updateNickname(requestDto.getNickname());
+		requestDto.getDescription().ifPresent(loginUser.getUserProfile()::updateDescription);
+		userRepository.save(loginUser);
+		log.info("User profile updated: {}", loginUser);
 	}
 
 	public User findUserByUsername(final String username) {

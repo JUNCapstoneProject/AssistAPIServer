@@ -46,6 +46,12 @@ public class UserProfile {
 		description = "";
 	}
 
+	public void updateNickname(final String nickname) {
+		if (nickname.length() >= 2 && nickname.length() <= 10) {
+			this.nickname = nickname;
+		}
+	}
+
 	public void updateDescription(final String description) {
 		this.description = description;
 	}
