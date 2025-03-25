@@ -24,7 +24,7 @@ public class CustomUser extends User {
 
 	public static CustomUser from(final com.help.stockassistplatform.domain.user.entity.User user) {
 		final List<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
+		authorities.add(new SimpleGrantedAuthority(user.getRole().getRoleName()));
 		return new CustomUser(
 			user.getUsername(),
 			user.getPassword(),
