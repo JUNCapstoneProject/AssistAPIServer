@@ -49,6 +49,7 @@ public class UserService {
 		}
 		loginUser.updatePassword(passwordEncoder.encode(requestDto.newPassword()));
 		userRepository.save(loginUser);
+		log.info("User password updated: {}", loginUser);
 	}
 
 	@Transactional
