@@ -61,11 +61,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		final Authentication authentication =
 			new UsernamePasswordAuthenticationToken(
 				userDetails,
-				userDetails.getPassword(),
+				null,
 				userDetails.getAuthorities()
 			);
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		log.info("Security Context에 '{}' 인증 정보를 저장", myUser.getUsername());
+		log.info("isAuthenticated: {}", SecurityContextHolder.getContext().getAuthentication().isAuthenticated());
 	}
 }
