@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.help.stockassistplatform.domain.user.dto.LoginCheckResponseDto;
-import com.help.stockassistplatform.domain.user.dto.LoginRequestDto;
+import com.help.stockassistplatform.domain.user.dto.request.LoginRequestDto;
+import com.help.stockassistplatform.domain.user.dto.response.LoginCheckResponseDto;
 import com.help.stockassistplatform.domain.user.service.AuthService;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
 

@@ -4,7 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.help.stockassistplatform.domain.user.dto.SignupRequestDto;
+import com.help.stockassistplatform.domain.user.dto.request.SignupRequestDto;
 import com.help.stockassistplatform.domain.user.entity.User;
 import com.help.stockassistplatform.domain.user.repository.UserRepository;
 import com.help.stockassistplatform.global.common.exception.CustomException;

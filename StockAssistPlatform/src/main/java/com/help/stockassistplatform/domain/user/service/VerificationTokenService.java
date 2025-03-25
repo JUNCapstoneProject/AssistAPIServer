@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.help.stockassistplatform.domain.user.dto.SignupRequestDto;
+import com.help.stockassistplatform.domain.user.dto.request.SignupRequestDto;
 import com.help.stockassistplatform.global.common.exception.CustomException;
 import com.help.stockassistplatform.global.common.exception.ErrorCode;
 

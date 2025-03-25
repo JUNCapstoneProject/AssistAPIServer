@@ -1,4 +1,4 @@
-package com.help.stockassistplatform.domain.user.dto;
+package com.help.stockassistplatform.domain.user.dto.response;
 
 import com.help.stockassistplatform.domain.user.entity.UserProfile;
 

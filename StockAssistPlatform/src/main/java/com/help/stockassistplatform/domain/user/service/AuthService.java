@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.help.stockassistplatform.domain.user.dto.LoginRequestDto;
+import com.help.stockassistplatform.domain.user.dto.request.LoginRequestDto;
 import com.help.stockassistplatform.domain.user.entity.User;
 import com.help.stockassistplatform.domain.user.repository.UserRepository;
 import com.help.stockassistplatform.global.common.exception.CustomException;

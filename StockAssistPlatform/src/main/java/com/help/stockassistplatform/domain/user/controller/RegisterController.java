@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.help.stockassistplatform.domain.user.dto.SignupRequestDto;
+import com.help.stockassistplatform.domain.user.dto.request.SignupRequestDto;
 import com.help.stockassistplatform.domain.user.service.EmailVerificationService;
 import com.help.stockassistplatform.domain.user.service.UserService;
 import com.help.stockassistplatform.domain.user.service.VerificationTokenService;
