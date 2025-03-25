@@ -13,10 +13,10 @@ import com.help.stockassistplatform.global.common.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@RequiredArgsConstructor
-@Transactional(readOnly = true)
-@Slf4j
 @Service
+@Slf4j
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class UserService {
 	private final UserRepository userRepository;
 	private final PasswordEncoder passwordEncoder;
@@ -32,6 +32,16 @@ public class UserService {
 			.build();
 		log.info("User registered: {}", user);
 		userRepository.save(user);
+	}
+
+	@Transactional
+	public void updateUserPassword(final User user) {
+		userRepository.save(user);
+	}
+
+	public User findUserByUsername(final String username) {
+		return userRepository.findWithProfileByUsername(username)
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 	}
 
 	public void validateDuplicateEmail(final String email) {
