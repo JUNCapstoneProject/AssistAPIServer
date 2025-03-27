@@ -1,15 +1,29 @@
 spring:
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    primary:
+      url: ${DB_URL}
+      username: ${DB_USER}
+      password: ${DB_PASSWORD}
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    secondary:
+      url: ${CRAWLING_DB_URL}
+      username: ${CRAWLING_DB_USER}
+      password: ${CRAWLING_DB_PASSWORD}
+      driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
-    properties:
+    open-in-view: false
+    primary:
+      properties:
+        hibernate:
+          show_sql: true
       hibernate:
-        show_sql: true
-    hibernate:
-      ddl-auto: update
+        ddl-auto: update
+    secondary:
+      properties:
+        hibernate:
+          show_sql: true
+      hibernate:
+        ddl-auto: none
   data:
     redis:
       host: localhost
