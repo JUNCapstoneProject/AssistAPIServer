@@ -4,19 +4,15 @@ import java.util.List;
 
 import org.springframework.data.domain.Slice;
 
-public record SliceResponse<T>(
+public record NewsSliceResponse<T>(
 	List<T> news,
-	int totalItems,
 	int currentPage,
-	int limit,
 	boolean hasNext
 ) {
-	public static <T> SliceResponse<T> from(final Slice<T> slice) {
-		return new SliceResponse<>(
+	public static <T> NewsSliceResponse<T> from(final Slice<T> slice) {
+		return new NewsSliceResponse<>(
 			slice.getContent(),
-			slice.getNumberOfElements(),
 			slice.getNumber() + 1, // 페이지 번호 1부터 시작
-			slice.getSize(),
 			slice.hasNext()
 		);
 	}
