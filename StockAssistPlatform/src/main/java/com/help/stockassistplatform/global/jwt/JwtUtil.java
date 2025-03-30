@@ -95,8 +95,9 @@ public class JwtUtil {
 	}
 
 	public Optional<String> extractRefreshTokenFromRequest(final HttpServletRequest request) {
-		if (request.getCookies() == null)
+		if (null == request.getCookies()) {
 			return Optional.empty();
+		}
 		for (final Cookie cookie : request.getCookies()) {
 			if (REFRESH_TOKEN.equals(cookie.getName())) {
 				return Optional.of(cookie.getValue());

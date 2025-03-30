@@ -35,13 +35,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		@NonNull final HttpServletRequest request,
 		@NonNull final HttpServletResponse response,
 		@NonNull final FilterChain filterChain) throws ServletException, IOException {
-		final String requestURI = request.getRequestURI();
+		final String requestUri = request.getRequestURI();
 
-		if (PatternMatchUtils.simpleMatch(WHITE_LIST, requestURI)) {
+		if (PatternMatchUtils.simpleMatch(WHITE_LIST, requestUri)) {
 			filterChain.doFilter(request, response);
 			return;
 		}
-		log.info("인증 필터 시작: {}", requestURI);
+		log.info("인증 필터 시작: {}", requestUri);
 		checkAccessTokenAndAuthentication(request, response, filterChain);
 	}
 
