@@ -13,6 +13,14 @@ jobs:
       run:
         working-directory: StockAssistPlatform
 
+    env:
+      GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
+      GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      CRAWLING_DB_URL: ${{ secrets.CRAWLING_DB_URL }}
+      CRAWLING_DB_USER: ${{ secrets.CRAWLING_DB_USER }}
+      CRAWLING_DB_PASSWORD: ${{ secrets.CRAWLING_DB_PASSWORD }}
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
