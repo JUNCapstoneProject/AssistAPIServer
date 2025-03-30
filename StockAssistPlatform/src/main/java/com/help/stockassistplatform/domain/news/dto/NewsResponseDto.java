@@ -38,8 +38,9 @@ public class NewsResponseDto {
 	}
 
 	private static String formatDate(final LocalDateTime dateTime) {
-		if (null == dateTime)
+		if (null == dateTime) {
 			return "";
+		}
 		final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd", Locale.KOREA);
 		return dateTime.format(formatter);
 	}

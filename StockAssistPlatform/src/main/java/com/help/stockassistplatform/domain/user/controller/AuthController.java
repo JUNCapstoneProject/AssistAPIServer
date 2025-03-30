@@ -24,14 +24,19 @@ public class AuthController {
 
 	// 로그인
 	@PostMapping("/login")
-	public ApiResponse<?> login(@Valid @RequestBody final LoginRequestDto loginRequestDto, final
-	HttpServletResponse response) {
+	public ApiResponse<?> login(
+		@Valid @RequestBody final LoginRequestDto loginRequestDto,
+		final HttpServletResponse response
+	) {
 		return authService.login(loginRequestDto, response);
 	}
 
 	// AccessToken 갱신 요청
 	@PostMapping("/refresh")
-	public ApiResponse<?> refresh(final HttpServletRequest request, final HttpServletResponse response) {
+	public ApiResponse<?> refresh(
+		final HttpServletRequest request,
+		final HttpServletResponse response
+	) {
 		return authService.refresh(request, response);
 	}
 

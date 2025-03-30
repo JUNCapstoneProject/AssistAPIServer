@@ -48,7 +48,12 @@ public class User {
 	@CreatedDate
 	private LocalDateTime createdAt;
 
-	@OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY, optional = false)
+	@OneToOne(
+		mappedBy = "user",
+		cascade = CascadeType.ALL,
+		orphanRemoval = true, fetch = FetchType.LAZY,
+		optional = false
+	)
 	private UserProfile userProfile;
 
 	@Builder
