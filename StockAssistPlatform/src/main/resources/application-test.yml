@@ -6,9 +6,9 @@ spring:
       username: sa
       password:
     secondary:
-      url: ${CRAWLING_DB_URL}
-      username: ${CRAWLING_DB_USER}
-      password: ${CRAWLING_DB_PASSWORD}
+      url: CRAWLING_DB_URL
+      username: CRAWLING_DB_USER
+      password: CRAWLING_DB_PASSWORD
       driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     open-in-view: false
@@ -32,8 +32,8 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${GMAIL_USERNAME}
-    password: ${GMAIL_APP_PASSWORD}
+    username: GMAIL_USERNAME
+    password: GMAIL_APP_PASSWORD
     properties:
       mail:
         smtp:
@@ -42,4 +42,4 @@ spring:
           starttls:
             enable: true
 jwt:
-  secret: ${JWT_SECRET}
+  secret: JWT_SECRET
