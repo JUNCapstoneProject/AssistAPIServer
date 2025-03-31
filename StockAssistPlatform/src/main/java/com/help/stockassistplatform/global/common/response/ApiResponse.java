@@ -1,6 +1,8 @@
-package com.help.stockassistplatform.common.response;
+package com.help.stockassistplatform.global.common.response;
 
 import org.springframework.http.HttpStatusCode;
+
+import com.help.stockassistplatform.global.common.exception.ErrorCode;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,10 @@ public class ApiResponse<T> {
 
 	public static ApiResponse<?> error(final String message, final HttpStatusCode status) {
 		return new ApiResponse<>(false, null, new ApiError(message, status.value()));
+	}
+
+	public static ApiResponse<?> error(final ErrorCode errorCode) {
+		return new ApiResponse<>(false, null, new ApiError(errorCode.getMessage(), errorCode.getStatus()));
 	}
 
 	private record ApiError(String message, int status) {

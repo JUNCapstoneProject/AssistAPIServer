@@ -5,14 +5,17 @@ import java.time.LocalDateTime;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -21,18 +24,18 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
-@ToString
+@ToString(exclude = "userProfile")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "users")
+@Table(name = "user_entity")
 @EntityListeners(AuditingEntityListener.class)
 @Entity
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Long userId;
 
 	@Column(nullable = false, unique = true)
-	private String email;
+	private String username;
 
 	@Column(nullable = false)
 	private String password;
@@ -41,17 +44,26 @@ public class User {
 	@Column(nullable = false)
 	private UserRole role = UserRole.USER;
 
-	@Column(nullable = false, length = 10)
-	private String nickname;
-
 	@Column(nullable = false, updatable = false)
 	@CreatedDate
 	private LocalDateTime createdAt;
 
+	@OneToOne(
+		mappedBy = "user",
+		cascade = CascadeType.ALL,
+		orphanRemoval = true, fetch = FetchType.LAZY,
+		optional = false
+	)
+	private UserProfile userProfile;
+
 	@Builder
-	public User(final String email, final String password, final String nickname) {
-		this.email = email;
+	public User(final String username, final String password, final String nickname) {
+		this.username = username;
 		this.password = password;
-		this.nickname = nickname;
+		userProfile = new UserProfile(this, username, nickname);
+	}
+
+	public void updatePassword(final String newPassword) {
+		password = newPassword;
 	}
 }
