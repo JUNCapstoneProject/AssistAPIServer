@@ -49,6 +49,7 @@ public class PrimaryDataSourceConfig {
 		config.setUsername(dbUser);
 		config.setPassword(dbPassword);
 		config.setDriverClassName("com.mysql.cj.jdbc.Driver");
+		config.setTransactionIsolation("TRANSACTION_READ_COMMITTED");
 		return new HikariDataSource(config);
 	}
 

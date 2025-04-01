@@ -24,7 +24,10 @@ import jakarta.persistence.EntityManagerFactory;
 @Configuration
 @EnableTransactionManagement
 @EnableJpaRepositories(
-	basePackages = "com.help.stockassistplatform.domain.news.repository",
+	basePackages = {
+		"com.help.stockassistplatform.domain.news.repository",
+		"com.help.stockassistplatform.domain.report.repository"
+	},
 	entityManagerFactoryRef = "secondaryEntityManagerFactory",
 	transactionManagerRef = "secondaryTransactionManager"
 )
@@ -45,6 +48,7 @@ public class SecondaryDataSourceConfig {
 		config.setUsername(dbUser);
 		config.setPassword(dbPassword);
 		config.setDriverClassName("com.mysql.cj.jdbc.Driver");
+		config.setTransactionIsolation("TRANSACTION_READ_COMMITTED");
 		return new HikariDataSource(config);
 	}
 
@@ -59,7 +63,10 @@ public class SecondaryDataSourceConfig {
 
 		return builder
 			.dataSource(dataSource)
-			.packages("com.help.stockassistplatform.domain.news.entity")
+			.packages(
+				"com.help.stockassistplatform.domain.news.entity",
+				"com.help.stockassistplatform.domain.report.entity"
+			)
 			.persistenceUnit("secondary")
 			.properties(properties) // Hibernate 설정 추가
 			.build();
