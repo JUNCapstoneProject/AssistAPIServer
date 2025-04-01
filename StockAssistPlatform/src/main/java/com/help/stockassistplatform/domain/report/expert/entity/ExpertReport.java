@@ -1,4 +1,4 @@
-package com.help.stockassistplatform.domain.report.entity;
+package com.help.stockassistplatform.domain.report.expert.entity;
 
 import java.time.LocalDateTime;
 

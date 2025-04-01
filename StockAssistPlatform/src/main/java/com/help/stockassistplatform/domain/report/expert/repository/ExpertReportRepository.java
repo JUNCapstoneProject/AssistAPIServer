@@ -1,17 +1,15 @@
-package com.help.stockassistplatform.domain.report.repository;
-
-import java.util.List;
+package com.help.stockassistplatform.domain.report.expert.repository;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.help.stockassistplatform.domain.report.entity.ExpertReport;
+import com.help.stockassistplatform.domain.report.expert.entity.ExpertReport;
 
 @Repository
 public interface ExpertReportRepository extends JpaRepository<ExpertReport, Long> {
 	Slice<ExpertReport> findAllBy(Pageable pageable);
 
-	List<ExpertReport> findByTagContaining(String keyword);
+	Slice<ExpertReport> findAllByTagContaining(String category, Pageable pageable);
 }

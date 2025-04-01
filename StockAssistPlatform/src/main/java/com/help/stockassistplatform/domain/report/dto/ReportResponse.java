@@ -1,9 +1,11 @@
 package com.help.stockassistplatform.domain.report.dto;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.help.stockassistplatform.domain.report.entity.ExpertReport;
+import com.help.stockassistplatform.domain.report.expert.entity.ExpertReport;
+import com.help.stockassistplatform.domain.report.user.entity.UserReport;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ReportResponse(
@@ -19,7 +21,7 @@ public record ReportResponse(
 	public static ReportResponse from(final ExpertReport report) {
 		return new ReportResponse(
 			null,
-			report.getTag(),
+			Optional.ofNullable(report.getTag()).orElse("기타"),
 			report.getAuthor(),
 			report.getTitle(),
 			summarize(report.getContent()),
@@ -28,17 +30,17 @@ public record ReportResponse(
 		);
 	}
 
-	// public static ReportResponse from(UserReport report) {
-	// 	return new ReportResponse(
-	// 		report.getId(),
-	// 		report.getCategory(),
-	// 		report.getSource(),
-	// 		report.getTitle(),
-	// 		report.getDescription(),
-	// 		report.getDate(),
-	// 		null
-	// 	);
-	// }
+	public static ReportResponse from(final UserReport report) {
+		return new ReportResponse(
+			report.getId(),
+			report.getCategory(),
+			report.getWriterNickname(),
+			report.getTitle(),
+			report.getDescription(),
+			report.getCreatedAt(),
+			null
+		);
+	}
 
 	private static String summarize(final String content) {
 		return null != content ? content.substring(0, Math.min(100, content.length())) + "..." : "";

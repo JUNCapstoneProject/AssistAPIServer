@@ -26,13 +26,16 @@ public class ReportController {
 	public ApiResponse<?> getReports(
 		@RequestParam(defaultValue = "expert") final String type,
 		@RequestParam(defaultValue = "1") final int page,
-		@RequestParam(defaultValue = "6") final int limit
+		@RequestParam(defaultValue = "6") final int limit,
+		@RequestParam(required = false) final String category
 	) {
-		final Pageable pageable = PageRequest.of(page - 1, limit, Sort.by(Sort.Direction.DESC, "date"));
+		final ReportType reportType = ReportType.from(type);
+		final Pageable pageable = PageRequest.of(page - 1, limit,
+			Sort.by(Sort.Direction.DESC, reportType.getSortKey()));
 
-		return switch (ReportType.from(type)) {
-			case EXPERT -> ApiResponse.success(expertReportService.getExpertReports(pageable));
-			case USER -> ApiResponse.success(userReportService.getUserReports(pageable));
+		return switch (reportType) {
+			case EXPERT -> ApiResponse.success(expertReportService.getExpertReports(pageable, category));
+			case USER -> ApiResponse.success(userReportService.getUserReports(pageable, category));
 		};
 	}
 }
