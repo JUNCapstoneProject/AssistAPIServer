@@ -8,11 +8,15 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
+import lombok.Getter;
 import lombok.Setter;
 
 public class CustomUser extends User {
 	@Setter
 	private Long userId;
+	@Getter
+	@Setter
+	private String nickname;
 
 	public CustomUser(
 		String username,
@@ -25,10 +29,14 @@ public class CustomUser extends User {
 	public static CustomUser from(final com.help.stockassistplatform.domain.user.entity.User user) {
 		final List<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority(user.getRole().getRoleName()));
-		return new CustomUser(
+		final CustomUser customUser = new CustomUser(
 			user.getUsername(),
 			user.getPassword(),
 			authorities
 		);
+		customUser.setUserId(user.getUserId());
+		customUser.setNickname(user.getUserProfile().getNickname());
+
+		return customUser;
 	}
 }
