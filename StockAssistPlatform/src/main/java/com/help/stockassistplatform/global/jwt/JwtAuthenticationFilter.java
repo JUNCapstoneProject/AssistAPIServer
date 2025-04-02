@@ -1,6 +1,7 @@
 package com.help.stockassistplatform.global.jwt;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,7 +26,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-	private static final String[] WHITE_LIST = {"/", "/api/auth/*"};
+	private record WhiteListEntry(String method, String uriPattern) {
+	}
+
+	private static final List<WhiteListEntry> WHITE_LIST = List.of(
+		new WhiteListEntry("GET", "/"),
+		new WhiteListEntry("GET", "/api/auth/*"),
+		new WhiteListEntry("POST", "/api/auth/*"),
+		new WhiteListEntry("GET", "/api/news"),
+		new WhiteListEntry("GET", "/api/reports")
+	);
 
 	private final JwtUtil jwtUtil;
 	private final UserRepository userRepository;
@@ -34,15 +44,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(
 		@NonNull final HttpServletRequest request,
 		@NonNull final HttpServletResponse response,
-		@NonNull final FilterChain filterChain) throws ServletException, IOException {
+		@NonNull final FilterChain filterChain
+	) throws ServletException, IOException {
 		final String requestUri = request.getRequestURI();
+		final String method = request.getMethod();
 
-		if (PatternMatchUtils.simpleMatch(WHITE_LIST, requestUri)) {
+		if (isWhiteListed(method, requestUri)) {
 			filterChain.doFilter(request, response);
 			return;
 		}
-		log.info("인증 필터 시작: {}", requestUri);
+		log.info("인증 필터 시작: [{}]{}", method, requestUri);
 		checkAccessTokenAndAuthentication(request, response, filterChain);
+	}
+
+	private boolean isWhiteListed(final String method, final String uri) {
+		return WHITE_LIST.stream()
+			.anyMatch(entry ->
+				entry.method().equalsIgnoreCase(method)
+					&& PatternMatchUtils.simpleMatch(entry.uriPattern(), uri)
+			);
 	}
 
 	private void checkAccessTokenAndAuthentication(final HttpServletRequest request, final HttpServletResponse response,
@@ -50,7 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		jwtUtil.extractAccessTokenFromRequest(request)
 			.filter(jwtUtil::isTokenValidate)
 			.flatMap(jwtUtil::extractUsername)
-			.flatMap(userRepository::findByUsername)
+			.flatMap(userRepository::findWithProfileByUsername)
 			.ifPresent(this::saveAuthentication);
 
 		filterChain.doFilter(request, response);

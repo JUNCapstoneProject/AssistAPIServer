@@ -27,7 +27,10 @@ import jakarta.persistence.EntityManagerFactory;
 @Profile("!test")
 @EnableTransactionManagement
 @EnableJpaRepositories(
-	basePackages = "com.help.stockassistplatform.domain.user.repository",
+	basePackages = {
+		"com.help.stockassistplatform.domain.user.repository",
+		"com.help.stockassistplatform.domain.report.user.repository"
+	},
 	entityManagerFactoryRef = "primaryEntityManagerFactory",
 	transactionManagerRef = "primaryTransactionManager"
 )
@@ -49,6 +52,7 @@ public class PrimaryDataSourceConfig {
 		config.setUsername(dbUser);
 		config.setPassword(dbPassword);
 		config.setDriverClassName("com.mysql.cj.jdbc.Driver");
+		config.setTransactionIsolation("TRANSACTION_READ_COMMITTED");
 		return new HikariDataSource(config);
 	}
 
@@ -64,7 +68,10 @@ public class PrimaryDataSourceConfig {
 
 		return builder
 			.dataSource(dataSource)
-			.packages("com.help.stockassistplatform.domain.user.entity")
+			.packages(
+				"com.help.stockassistplatform.domain.user.entity",
+				"com.help.stockassistplatform.domain.report.user.entity"
+			)
 			.persistenceUnit("primary")
 			.properties(properties)
 			.build();

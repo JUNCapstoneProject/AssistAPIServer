@@ -32,12 +32,10 @@ public class AuthService implements UserDetailsService {
 
 	@Override
 	public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
-		final var user = userRepository.findByUsername(username)
+		final var user = userRepository.findWithProfileByUsername(username)
 			.orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다"));
 
-		final CustomUser userDetails = CustomUser.from(user);
-		userDetails.setUserId(user.getUserId());
-		return userDetails;
+		return CustomUser.from(user);
 	}
 
 	public ApiResponse<?> login(final LoginRequestDto loginRequestDto, final HttpServletResponse response) {

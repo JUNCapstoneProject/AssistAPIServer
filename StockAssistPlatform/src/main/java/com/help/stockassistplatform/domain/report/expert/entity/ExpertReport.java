@@ -1,4 +1,4 @@
-package com.help.stockassistplatform.domain.news.entity;
+package com.help.stockassistplatform.domain.report.expert.entity;
 
 import java.time.LocalDateTime;
 
@@ -12,40 +12,33 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "news_vw")
+@Table(name = "reports_vw")
 @Immutable
 @Getter
 @NoArgsConstructor
-public class NewsView {
+public class ExpertReport {
 
 	@Id
 	@Column(name = "crawling_id")
-	private String id;
+	private Long id;
 
-	@Column(name = "organization")
-	private String organization;
-
-	@Column(name = "title")
 	private String title;
 
-	@Column(name = "hits")
-	private Long hits;
+	@Column(name = "transed_title")
+	private String transedTitle;
 
-	@Column(name = "author")
+	private int hits;
 	private String author;
 
 	@Column(name = "posted_at")
-	private LocalDateTime postedAt;
+	private LocalDateTime date;
 
-	@Column(name = "content")
+	@Column(columnDefinition = "TEXT")
 	private String content;
 
-	@Column(name = "tag")
 	private String tag;
 
-	// @Column(name = "ai_analysis")
-	// private String aiAnalysis;
-
 	@Column(name = "target_url")
-	private String url;
+	private String link;
 }
+

@@ -1,14 +1,10 @@
 package com.help.stockassistplatform.domain.user.entity;
 
-import java.time.LocalDateTime;
-
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import com.help.stockassistplatform.global.common.BaseTimeEntity;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -27,9 +23,8 @@ import lombok.ToString;
 @ToString(exclude = "userProfile")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "user_entity")
-@EntityListeners(AuditingEntityListener.class)
 @Entity
-public class User {
+public class User extends BaseTimeEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long userId;
@@ -44,10 +39,6 @@ public class User {
 	@Column(nullable = false)
 	private UserRole role = UserRole.USER;
 
-	@Column(nullable = false, updatable = false)
-	@CreatedDate
-	private LocalDateTime createdAt;
-
 	@OneToOne(
 		mappedBy = "user",
 		cascade = CascadeType.ALL,
@@ -55,6 +46,14 @@ public class User {
 		optional = false
 	)
 	private UserProfile userProfile;
+
+	public static User ofId(final Long userId) {
+		return new User(userId);
+	}
+
+	private User(final Long userId) {
+		this.userId = userId;
+	}
 
 	@Builder
 	public User(final String username, final String password, final String nickname) {

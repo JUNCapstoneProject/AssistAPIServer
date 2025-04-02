@@ -49,6 +49,7 @@ public class JwtUtil {
 
 		final String accessToken = Jwts.builder()
 			.claim("username", user.getUsername())
+			.claim("nickname", user.getNickname())
 			.claim("authorities", authorities)
 			.subject(ACCESS_TOKEN)
 			.issuedAt(new Date(System.currentTimeMillis()))
