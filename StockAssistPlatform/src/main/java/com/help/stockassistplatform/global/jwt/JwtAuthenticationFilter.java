@@ -70,7 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		jwtUtil.extractAccessTokenFromRequest(request)
 			.filter(jwtUtil::isTokenValidate)
 			.flatMap(jwtUtil::extractUsername)
-			.flatMap(userRepository::findByUsername)
+			.flatMap(userRepository::findWithProfileByUsername)
 			.ifPresent(this::saveAuthentication);
 
 		filterChain.doFilter(request, response);

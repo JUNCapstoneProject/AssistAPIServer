@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class CustomUser extends User {
+	@Getter
 	@Setter
 	private Long userId;
 	@Getter
