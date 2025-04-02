@@ -54,4 +54,16 @@ public class UserReport extends BaseTimeEntity {
 		this.user = user;
 		this.writerNickname = writerNickname;
 	}
+
+	public void update(final String title, final String content, final String category) {
+		if (null != title && !title.isBlank()) {
+			this.title = title;
+		}
+		if (null != content && !content.isBlank()) {
+			this.content = content;
+		}
+		if (null != category && !category.isBlank()) {
+			this.category = category;
+		}
+	}
 }

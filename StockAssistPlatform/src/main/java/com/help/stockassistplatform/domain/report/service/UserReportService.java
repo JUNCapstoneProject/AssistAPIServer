@@ -5,7 +5,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.help.stockassistplatform.domain.report.dto.request.CreateUserReportRequest;
+import com.help.stockassistplatform.domain.report.dto.request.UserReportRequest;
 import com.help.stockassistplatform.domain.report.dto.response.ReportResponse;
 import com.help.stockassistplatform.domain.report.dto.response.UserReportDetailResponse;
 import com.help.stockassistplatform.domain.report.user.entity.UserReport;
@@ -36,7 +36,7 @@ public class UserReportService {
 	}
 
 	@Transactional
-	public void createReport(final CreateUserReportRequest request, final CustomUser userDetail) {
+	public void createReport(final UserReportRequest request, final CustomUser userDetail) {
 		final User userRef = User.ofId(userDetail.getUserId());
 
 		final UserReport report = UserReport.builder()
@@ -57,5 +57,35 @@ public class UserReportService {
 		final Long currentUserId = (null != userDetail) ? userDetail.getUserId() : null;
 		final boolean isAuthor = report.getUser().getUserId().equals(currentUserId);
 		return UserReportDetailResponse.of(report, isAuthor);
+	}
+
+	@Transactional
+	public void updateReport(
+		final Long reportId,
+		final UserReportRequest request,
+		final CustomUser userDetail
+	) {
+		final UserReport report = userReportRepository.findById(reportId)
+			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+
+		final Long currentUserId = (null != userDetail) ? userDetail.getUserId() : null;
+		validateAuthor(report, currentUserId);
+
+		log.debug("Updating title from [{}] to [{}]", report.getTitle(), request.title());
+		report.update(
+			request.title(),
+			request.content(),
+			request.category()
+		);
+	}
+
+	private void validateAuthor(final UserReport report, final Long userId) {
+		if (!report.getUser().getUserId().equals(userId)) {
+			throw new CustomException(ErrorCode.NOT_FOUND);// 보안상 NOT_FOUND로 처리
+		}
+	}
+
+	@Transactional
+	public void deleteReport(Long id, CustomUser userDetail) {
 	}
 }
