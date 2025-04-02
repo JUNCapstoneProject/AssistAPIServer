@@ -23,7 +23,10 @@ import jakarta.persistence.EntityManagerFactory;
 @TestConfiguration
 @EnableTransactionManagement
 @EnableJpaRepositories(
-	basePackages = "com.help.stockassistplatform.domain.user.repository",
+	basePackages = {
+		"com.help.stockassistplatform.domain.user.repository",
+		"com.help.stockassistplatform.domain.report.user.repository"
+	},
 	entityManagerFactoryRef = "testEntityManagerFactory",
 	transactionManagerRef = "testTransactionManager"
 )
@@ -50,7 +53,10 @@ public class TestPrimaryDataSourceConfig {
 
 		return builder
 			.dataSource(dataSource)
-			.packages("com.help.stockassistplatform.domain.user.entity")
+			.packages(
+				"com.help.stockassistplatform.domain.user.entity",
+				"com.help.stockassistplatform.domain.report.user.entity"
+			)
 			.persistenceUnit("test")
 			.properties(properties)
 			.build();

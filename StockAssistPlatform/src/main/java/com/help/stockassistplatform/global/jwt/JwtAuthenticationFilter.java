@@ -60,8 +60,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private boolean isWhiteListed(final String method, final String uri) {
 		return WHITE_LIST.stream()
 			.anyMatch(entry ->
-				entry.method().equalsIgnoreCase(method) &&
-					PatternMatchUtils.simpleMatch(entry.uriPattern(), uri)
+				entry.method().equalsIgnoreCase(method)
+					&& PatternMatchUtils.simpleMatch(entry.uriPattern(), uri)
 			);
 	}
 
