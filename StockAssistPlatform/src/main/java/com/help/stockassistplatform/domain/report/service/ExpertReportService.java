@@ -1,7 +1,5 @@
 package com.help.stockassistplatform.domain.report.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -23,16 +21,14 @@ public class ExpertReportService {
 
 	private final ExpertReportRepository expertReportRepository;
 
-	public List<ReportResponse> getExpertReports(final Pageable pageable, @Nullable final String category) {
+	public Slice<ReportResponse> getExpertReports(final Pageable pageable, @Nullable final String category) {
 		log.info("[GET]/api/reports, type=expert, category={}", category);
 
 		final Slice<ExpertReport> slice = (null == category || category.isBlank())
 			? expertReportRepository.findAllBy(pageable)
 			: expertReportRepository.findAllByTagContaining(category, pageable);
 
-		return slice.stream()
-			.map(ReportResponse::from)
-			.toList();
+		return slice.map(ReportResponse::from);
 	}
 }
 

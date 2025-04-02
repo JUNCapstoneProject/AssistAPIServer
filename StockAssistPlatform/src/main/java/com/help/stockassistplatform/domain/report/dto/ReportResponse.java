@@ -36,7 +36,7 @@ public record ReportResponse(
 			report.getCategory(),
 			report.getWriterNickname(),
 			report.getTitle(),
-			report.getDescription(),
+			summarize(report.getContent()),
 			report.getCreatedAt(),
 			null
 		);

@@ -31,7 +31,7 @@ public class UserReport extends BaseTimeEntity {
 
 	@Lob
 	@Column(nullable = false)
-	private String description;
+	private String content;
 
 	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "user_id")
@@ -44,13 +44,13 @@ public class UserReport extends BaseTimeEntity {
 	public UserReport(
 		final String category,
 		final String title,
-		final String description,
+		final String content,
 		final User user,
 		final String writerNickname
 	) {
 		this.category = category;
 		this.title = title;
-		this.description = description;
+		this.content = content;
 		this.user = user;
 		this.writerNickname = writerNickname;
 	}

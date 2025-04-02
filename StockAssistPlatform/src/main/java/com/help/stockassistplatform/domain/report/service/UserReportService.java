@@ -1,7 +1,5 @@
 package com.help.stockassistplatform.domain.report.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -22,14 +20,12 @@ import lombok.extern.slf4j.Slf4j;
 public class UserReportService {
 	private final UserReportRepository userReportRepository;
 
-	public List<ReportResponse> getUserReports(final Pageable pageable, @Nullable final String category) {
+	public Slice<ReportResponse> getUserReports(final Pageable pageable, @Nullable final String category) {
 		log.info("[GET]/api/reports, type=user, category={}", category);
 		final Slice<UserReport> slice = (null == category || category.isBlank())
 			? userReportRepository.findAllBy(pageable)
 			: userReportRepository.findAllByCategoryContaining(category, pageable);
 
-		return slice.stream()
-			.map(ReportResponse::from)
-			.toList();
+		return slice.map(ReportResponse::from);
 	}
 }
