@@ -7,9 +7,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.help.stockassistplatform.domain.report.dto.request.CreateUserReportRequest;
 import com.help.stockassistplatform.domain.report.dto.response.ReportResponse;
+import com.help.stockassistplatform.domain.report.dto.response.UserReportDetailResponse;
 import com.help.stockassistplatform.domain.report.user.entity.UserReport;
 import com.help.stockassistplatform.domain.report.user.repository.UserReportRepository;
 import com.help.stockassistplatform.domain.user.entity.User;
+import com.help.stockassistplatform.global.common.exception.CustomException;
+import com.help.stockassistplatform.global.common.exception.ErrorCode;
 import com.help.stockassistplatform.global.jwt.CustomUser;
 
 import jakarta.annotation.Nullable;
@@ -45,5 +48,14 @@ public class UserReportService {
 			.build();
 
 		userReportRepository.save(report);
+	}
+
+	public UserReportDetailResponse getReportDetail(final Long reportId, final CustomUser userDetail) {
+		final UserReport report = userReportRepository.findById(reportId)
+			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+
+		final Long currentUserId = (null != userDetail) ? userDetail.getUserId() : null;
+		final boolean isAuthor = report.getUser().getUserId().equals(currentUserId);
+		return UserReportDetailResponse.of(report, isAuthor);
 	}
 }

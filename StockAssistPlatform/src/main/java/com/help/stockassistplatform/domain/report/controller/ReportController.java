@@ -6,6 +6,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.help.stockassistplatform.domain.report.dto.request.CreateUserReportRequest;
 import com.help.stockassistplatform.domain.report.dto.request.ReportType;
 import com.help.stockassistplatform.domain.report.dto.response.ReportSliceResponse;
+import com.help.stockassistplatform.domain.report.dto.response.UserReportDetailResponse;
 import com.help.stockassistplatform.domain.report.service.ExpertReportService;
 import com.help.stockassistplatform.domain.report.service.UserReportService;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
@@ -57,11 +59,19 @@ public class ReportController {
 	@PreAuthorize("isAuthenticated()")
 	@PostMapping
 	public ApiResponse<?> createReport(
-		@RequestBody @Valid CreateUserReportRequest request,
-		@AuthenticationPrincipal CustomUser userDetail
+		@RequestBody @Valid final CreateUserReportRequest request,
+		@AuthenticationPrincipal final CustomUser userDetail
 	) {
-
 		userReportService.createReport(request, userDetail);
-		return ApiResponse.success("리포트가 성공적으로 저장되었습니다.");
+		return ApiResponse.success(null);
+	}
+
+	@GetMapping("/{id}")
+	public ApiResponse<?> getUserReport(
+		@PathVariable final Long id,
+		@AuthenticationPrincipal final CustomUser userDetail
+	) {
+		final UserReportDetailResponse response = userReportService.getReportDetail(id, userDetail);
+		return ApiResponse.success(response);
 	}
 }
