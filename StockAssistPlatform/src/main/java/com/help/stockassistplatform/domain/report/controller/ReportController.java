@@ -85,7 +85,7 @@ public class ReportController {
 		@AuthenticationPrincipal final CustomUser userDetail
 	) {
 		userReportService.updateReport(id, request, userDetail);
-		return ApiResponse.success("리포트가 성공적으로 수정되었습니다.");
+		return ApiResponse.success(null);
 	}
 
 	@DeleteMapping("/{id}")
@@ -95,6 +95,6 @@ public class ReportController {
 		@AuthenticationPrincipal final CustomUser userDetail
 	) {
 		userReportService.deleteReport(id, userDetail);
-		return ApiResponse.success("리포트가 성공적으로 삭제되었습니다.");
+		return ApiResponse.success(null);
 	}
 }
