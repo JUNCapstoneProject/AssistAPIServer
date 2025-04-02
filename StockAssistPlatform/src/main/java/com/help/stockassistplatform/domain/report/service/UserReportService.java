@@ -51,11 +51,9 @@ public class UserReportService {
 	}
 
 	public UserReportDetailResponse getReportDetail(final Long reportId, final CustomUser userDetail) {
-		final UserReport report = userReportRepository.findById(reportId)
-			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+		final UserReport report = getReportOrThrow(reportId);
+		final boolean isAuthor = isAuthor(report, userDetail);
 
-		final Long currentUserId = (null != userDetail) ? userDetail.getUserId() : null;
-		final boolean isAuthor = report.getUser().getUserId().equals(currentUserId);
 		return UserReportDetailResponse.of(report, isAuthor);
 	}
 
@@ -65,13 +63,11 @@ public class UserReportService {
 		final UserReportRequest request,
 		final CustomUser userDetail
 	) {
-		final UserReport report = userReportRepository.findById(reportId)
-			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+		final UserReport report = getReportOrThrow(reportId);
 
-		final Long currentUserId = (null != userDetail) ? userDetail.getUserId() : null;
-		validateAuthor(report, currentUserId);
+		validateAuthor(report, userDetail);
 
-		log.debug("Updating title from [{}] to [{}]", report.getTitle(), request.title());
+		log.debug("Updating to {}", request.toString());
 		report.update(
 			request.title(),
 			request.content(),
@@ -79,13 +75,29 @@ public class UserReportService {
 		);
 	}
 
-	private void validateAuthor(final UserReport report, final Long userId) {
-		if (!report.getUser().getUserId().equals(userId)) {
-			throw new CustomException(ErrorCode.NOT_FOUND);// 보안상 NOT_FOUND로 처리
+	@Transactional
+	public void deleteReport(final Long reportId, final CustomUser userDetail) {
+		final UserReport report = getReportOrThrow(reportId);
+
+		validateAuthor(report, userDetail);
+
+		log.debug("Deleting report {}", reportId);
+		userReportRepository.delete(report);
+	}
+
+	private UserReport getReportOrThrow(final Long id) {
+		return userReportRepository.findById(id)
+			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
+	}
+
+	private void validateAuthor(final UserReport report, final CustomUser userDetail) {
+		if (!isAuthor(report, userDetail)) {
+			throw new CustomException(ErrorCode.NOT_FOUND); // 보안상 NOT_FOUND로 처리
 		}
 	}
 
-	@Transactional
-	public void deleteReport(Long id, CustomUser userDetail) {
+	private boolean isAuthor(final UserReport report, final CustomUser userDetail) {
+		final Long currentUserId = (null != userDetail) ? userDetail.getUserId() : null;
+		return report.getUser().getUserId().equals(currentUserId);
 	}
 }
