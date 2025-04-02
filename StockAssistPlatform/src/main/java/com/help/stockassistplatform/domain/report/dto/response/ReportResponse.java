@@ -1,4 +1,4 @@
-package com.help.stockassistplatform.domain.report.dto;
+package com.help.stockassistplatform.domain.report.dto.response;
 
 import java.time.LocalDateTime;
 import java.util.Optional;

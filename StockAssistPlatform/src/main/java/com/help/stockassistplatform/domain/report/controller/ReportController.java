@@ -3,17 +3,24 @@ package com.help.stockassistplatform.domain.report.controller;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.help.stockassistplatform.domain.report.dto.ReportSliceResponse;
-import com.help.stockassistplatform.domain.report.dto.ReportType;
+import com.help.stockassistplatform.domain.report.dto.request.CreateUserReportRequest;
+import com.help.stockassistplatform.domain.report.dto.request.ReportType;
+import com.help.stockassistplatform.domain.report.dto.response.ReportSliceResponse;
 import com.help.stockassistplatform.domain.report.service.ExpertReportService;
 import com.help.stockassistplatform.domain.report.service.UserReportService;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
+import com.help.stockassistplatform.global.jwt.CustomUser;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -45,5 +52,16 @@ public class ReportController {
 				ReportSliceResponse.from(userReportService.getUserReports(pageable, category))
 			);
 		};
+	}
+
+	@PreAuthorize("isAuthenticated()")
+	@PostMapping
+	public ApiResponse<?> createReport(
+		@RequestBody @Valid CreateUserReportRequest request,
+		@AuthenticationPrincipal CustomUser userDetail
+	) {
+
+		userReportService.createReport(request, userDetail);
+		return ApiResponse.success("리포트가 성공적으로 저장되었습니다.");
 	}
 }

@@ -5,7 +5,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.help.stockassistplatform.domain.report.dto.ReportResponse;
+import com.help.stockassistplatform.domain.report.dto.response.ReportResponse;
 import com.help.stockassistplatform.domain.report.expert.entity.ExpertReport;
 import com.help.stockassistplatform.domain.report.expert.repository.ExpertReportRepository;
 
