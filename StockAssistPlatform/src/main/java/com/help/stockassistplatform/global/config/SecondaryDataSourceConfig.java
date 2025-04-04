@@ -26,7 +26,8 @@ import jakarta.persistence.EntityManagerFactory;
 @EnableJpaRepositories(
 	basePackages = {
 		"com.help.stockassistplatform.domain.news.repository",
-		"com.help.stockassistplatform.domain.report.expert.repository"
+		"com.help.stockassistplatform.domain.report.expert.repository",
+		"com.help.stockassistplatform.domain.stock.repository"
 	},
 	entityManagerFactoryRef = "secondaryEntityManagerFactory",
 	transactionManagerRef = "secondaryTransactionManager"
@@ -65,7 +66,8 @@ public class SecondaryDataSourceConfig {
 			.dataSource(dataSource)
 			.packages(
 				"com.help.stockassistplatform.domain.news.entity",
-				"com.help.stockassistplatform.domain.report.expert.entity"
+				"com.help.stockassistplatform.domain.report.expert.entity",
+				"com.help.stockassistplatform.domain.stock.entity"
 			)
 			.persistenceUnit("secondary")
 			.properties(properties) // Hibernate 설정 추가
