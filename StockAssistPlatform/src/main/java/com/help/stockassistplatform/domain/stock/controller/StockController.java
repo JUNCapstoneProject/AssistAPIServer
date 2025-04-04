@@ -22,8 +22,11 @@ public class StockController {
 
 	@GetMapping("/search")
 	public ApiResponse<?> searchCompanies(
-		@RequestParam("query") final String query
+		@RequestParam(value = "query", required = false, defaultValue = "") final String query
 	) {
+		if (query.isBlank()) {
+			return ApiResponse.success(Map.of("searchData", List.of()));
+		}
 		final List<StockSearchResponse> results = stockService.search(query);
 		return ApiResponse.success(Map.of("searchData", results));
 	}

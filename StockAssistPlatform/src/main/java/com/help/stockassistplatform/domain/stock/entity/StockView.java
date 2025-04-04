@@ -20,9 +20,12 @@ public class StockView {
 	@Column(name = "company_id")
 	private Integer companyId;
 
-	@Column(name = "ticker", nullable = false)
+	@Column(name = "ticker")
 	private String ticker;
 
-	@Column(name = "company_name_kr", nullable = false)
+	@Column(name = "name_kr")
 	private String companyNameKr;
+
+	@Column(name = "name_en")
+	private String companyNameEn;
 }
