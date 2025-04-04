@@ -26,7 +26,8 @@ import jakarta.persistence.EntityManagerFactory;
 @EnableJpaRepositories(
 	basePackages = {
 		"com.help.stockassistplatform.domain.news.repository",
-		"com.help.stockassistplatform.domain.report.expert.repository"
+		"com.help.stockassistplatform.domain.report.expert.repository",
+		"com.help.stockassistplatform.domain.stock.repository"
 	},
 	entityManagerFactoryRef = "secondaryEntityManagerFactory",
 	transactionManagerRef = "secondaryTransactionManager"
@@ -59,13 +60,15 @@ public class SecondaryDataSourceConfig {
 		final Map<String, Object> properties = new HashMap<>();
 		properties.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect"); // Dialect 명시적 설정
 		properties.put("hibernate.show_sql", true);
+		properties.put("hibernate.generate_statistics", true);
 		properties.put("hibernate.hbm2ddl.auto", "none"); // 읽기 전용 DB이므로
 
 		return builder
 			.dataSource(dataSource)
 			.packages(
 				"com.help.stockassistplatform.domain.news.entity",
-				"com.help.stockassistplatform.domain.report.expert.entity"
+				"com.help.stockassistplatform.domain.report.expert.entity",
+				"com.help.stockassistplatform.domain.stock.entity"
 			)
 			.persistenceUnit("secondary")
 			.properties(properties) // Hibernate 설정 추가
