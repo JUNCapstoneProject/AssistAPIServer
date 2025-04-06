@@ -15,6 +15,8 @@ public enum ErrorCode {
 
 	USER_NOT_FOUND(404, "사용자를 찾을 수 없습니다"),
 	NOT_FOUND(404, "페이지를 찾을 수 없습니다"),
+	TICKER_NOT_FOUND(404, "재무제표 데이터를 찾을 수 없습니다"),
+
 
 	EMAIL_ALREADY_EXISTS(409, "이미 존재하는 이메일입니다"),
 
