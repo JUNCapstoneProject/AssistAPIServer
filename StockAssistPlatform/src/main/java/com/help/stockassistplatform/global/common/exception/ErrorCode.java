@@ -17,6 +17,7 @@ public enum ErrorCode {
 	NOT_FOUND(404, "페이지를 찾을 수 없습니다"),
 	TICKER_NOT_FOUND(404, "재무제표 데이터를 찾을 수 없습니다"),
 
+
 	EMAIL_ALREADY_EXISTS(409, "이미 존재하는 이메일입니다"),
 
 	INTERNAL_SERVER_ERROR(500, "서버에서 오류가 발생했습니다");
