@@ -12,9 +12,26 @@ public interface CompanyIndexedRepository extends JpaRepository<CompanyIndexed, 
 	// 검색용 Native Query
 	@Query(value = """
 		SELECT * FROM company_indexed
-		WHERE MATCH(name_kr, name_en) AGAINST(:query)
+		WHERE MATCH(ticker, name_kr, name_en) AGAINST(:query IN BOOLEAN MODE)
 		LIMIT 10
 		""", nativeQuery = true)
 	List<CompanyIndexed> searchPreview(@Param("query") String query);
 
+	// Boolean Mode (prefix 검색)
+	@Query(value = """
+		SELECT *
+		FROM company_indexed
+		WHERE MATCH(ticker, name_kr, name_en) AGAINST(:query IN BOOLEAN MODE)
+		LIMIT 10
+		""", nativeQuery = true)
+	List<CompanyIndexed> prefixSearch(@Param("query") String query);
+
+	// Natural Mode (유사도 순)
+	@Query(value = """
+		SELECT *
+		FROM company_indexed
+		WHERE MATCH(ticker, name_kr, name_en) AGAINST(:query)
+		LIMIT 10
+		""", nativeQuery = true)
+	List<CompanyIndexed> relevanceSearch(@Param("query") String query);
 }
