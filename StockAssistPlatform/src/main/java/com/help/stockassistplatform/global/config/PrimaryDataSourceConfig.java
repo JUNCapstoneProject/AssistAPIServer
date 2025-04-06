@@ -29,7 +29,8 @@ import jakarta.persistence.EntityManagerFactory;
 @EnableJpaRepositories(
 	basePackages = {
 		"com.help.stockassistplatform.domain.user.repository",
-		"com.help.stockassistplatform.domain.report.user.repository"
+		"com.help.stockassistplatform.domain.report.user.repository",
+		"com.help.stockassistplatform.domain.stock.indexed.repository"
 	},
 	entityManagerFactoryRef = "primaryEntityManagerFactory",
 	transactionManagerRef = "primaryTransactionManager"
@@ -70,7 +71,8 @@ public class PrimaryDataSourceConfig {
 			.dataSource(dataSource)
 			.packages(
 				"com.help.stockassistplatform.domain.user.entity",
-				"com.help.stockassistplatform.domain.report.user.entity"
+				"com.help.stockassistplatform.domain.report.user.entity",
+				"com.help.stockassistplatform.domain.stock.indexed.entity"
 			)
 			.persistenceUnit("primary")
 			.properties(properties)
