@@ -28,7 +28,8 @@ import jakarta.persistence.EntityManagerFactory;
 		"com.help.stockassistplatform.domain.news.repository",
 		"com.help.stockassistplatform.domain.report.expert.repository",
 		"com.help.stockassistplatform.domain.stock.repository",
-		"com.help.stockassistplatform.domain.financial.repository"
+		"com.help.stockassistplatform.domain.financial.repository",
+		"com.help.stockassistplatform.domain.macro.repository"
 	},
 	entityManagerFactoryRef = "secondaryEntityManagerFactory",
 	transactionManagerRef = "secondaryTransactionManager"
@@ -70,7 +71,9 @@ public class SecondaryDataSourceConfig {
 				"com.help.stockassistplatform.domain.news.entity",
 				"com.help.stockassistplatform.domain.report.expert.entity",
 				"com.help.stockassistplatform.domain.stock.entity",
-				"com.help.stockassistplatform.domain.financial.entity"
+				"com.help.stockassistplatform.domain.financial.entity",
+				"com.help.stockassistplatform.domain.macro.entity"
+
 			)
 			.persistenceUnit("secondary")
 			.properties(properties) // Hibernate 설정 추가
