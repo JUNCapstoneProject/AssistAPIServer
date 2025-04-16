@@ -1,7 +1,5 @@
 package com.help.stockassistplatform.domain.stock.indexed.entity;
 
-import org.hibernate.annotations.Immutable;
-
 import com.help.stockassistplatform.domain.stock.view.entity.CompanyView;
 
 import jakarta.persistence.Column;
@@ -15,7 +13,6 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "company_indexed")
-@Immutable
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
