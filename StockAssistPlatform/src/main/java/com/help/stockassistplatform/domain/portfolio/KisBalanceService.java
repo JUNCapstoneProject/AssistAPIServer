@@ -38,6 +38,7 @@ public class KisBalanceService {
 		final JsonNode raw = getOverseaBalance(cano, acntPrdtCd, excgCd, currency);
 		final JsonNode output1 = raw.get("output1");
 		final JsonNode output2 = raw.get("output2");
+		System.out.println(output2);
 		final BigDecimal cash = getCashFromPsAmount(cano, acntPrdtCd);
 		return from(output1, output2, cash);
 	}
@@ -68,8 +69,9 @@ public class KisBalanceService {
 		}
 
 		JsonNode output = response.get("output");
-		System.out.println("output = " + output);
-		return getDecimalSafe(output, "frcr_ord_psbl_amt1", "0");
+		BigDecimal cash = getDecimalSafe(output, "frcr_ord_psbl_amt1", "0");
+		BigDecimal exchangeRate = getDecimalSafe(output, "exrt", "1000.0");
+		return cash.multiply(exchangeRate);
 	}
 
 	/**

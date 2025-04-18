@@ -28,18 +28,18 @@ public record StockBalanceResponse(
 			.map(StockItem::from)
 			.toList();
 
-		final BigDecimal investAmount = getDecimalSafe(output2, "frcr_buy_amt_smtl1", DEFAULT_AMOUNT);
-		final BigDecimal evalProfit = getDecimalSafe(output2, "tot_evlu_pfls_amt", DEFAULT_AMOUNT);
-		final BigDecimal totalAsset = stockItems.stream()
-			.map(item -> getEvalAmountSafe(item.evalAmount()))
-			.reduce(BigDecimal.ZERO, BigDecimal::add)
-			.add(cash); // 정확한 totalAsset = 종목 평가금액 합 + 예수금
-
+		final BigDecimal investmentAmount = getDecimalSafe(output2, "frcr_buy_amt_smtl1", DEFAULT_AMOUNT); // 투자금액
+		final BigDecimal evaluationProfit = getDecimalSafe(output2, "tot_evlu_pfls_amt", DEFAULT_AMOUNT); // 평가손익
+		final BigDecimal profitRate = getDecimalSafe(output2, "tot_pftrt", DEFAULT_RATE);
+		final BigDecimal totalAsset = investmentAmount
+			.add(evaluationProfit)
+			.add(cash);
+		
 		return new StockBalanceResponse(
 			totalAsset.toPlainString(),
-			investAmount.toPlainString(),
-			evalProfit.toPlainString(),
-			getSafe(output2, "tot_pftrt", DEFAULT_RATE),
+			investmentAmount.toPlainString(),
+			evaluationProfit.toPlainString(),
+			profitRate.toPlainString(),
 			cash.toPlainString(),
 			stockItems
 		);
