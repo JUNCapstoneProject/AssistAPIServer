@@ -51,3 +51,5 @@ jwt:
 kis:
   app-key: ${KIS_APP_KEY}
   app-secret: ${KIS_APP_SECRET}
+  cano: ${KIS_CANO}
+  acnt-prdt-no: ${KIS_ACNT_PRDT_NO}
