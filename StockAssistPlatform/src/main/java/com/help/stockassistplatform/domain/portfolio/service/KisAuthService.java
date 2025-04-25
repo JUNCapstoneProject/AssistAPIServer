@@ -1,4 +1,4 @@
-package com.help.stockassistplatform.domain.portfolio;
+package com.help.stockassistplatform.domain.portfolio.service;
 
 import java.time.Duration;
 import java.util.Map;

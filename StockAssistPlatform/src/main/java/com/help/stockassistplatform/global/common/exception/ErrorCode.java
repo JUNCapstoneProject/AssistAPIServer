@@ -17,9 +17,10 @@ public enum ErrorCode {
 	NOT_FOUND(404, "페이지를 찾을 수 없습니다"),
 	TICKER_NOT_FOUND(404, "재무제표 데이터를 찾을 수 없습니다"),
 
-
 	EMAIL_ALREADY_EXISTS(409, "이미 존재하는 이메일입니다"),
 
+	KIS_ACCESS_TOKEN_FAILURE(500, "KIS Access Token 획득 실패"),
+	KIS_DEPOSIT_QUERY_FAILURE(500, "KIS API 예수금 조회 실패"),
 	INTERNAL_SERVER_ERROR(500, "서버에서 오류가 발생했습니다");
 
 	private final int status;

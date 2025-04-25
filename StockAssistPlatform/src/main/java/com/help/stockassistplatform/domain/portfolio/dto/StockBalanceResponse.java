@@ -1,4 +1,4 @@
-package com.help.stockassistplatform.domain.portfolio;
+package com.help.stockassistplatform.domain.portfolio.dto;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -34,7 +34,7 @@ public record StockBalanceResponse(
 		final BigDecimal totalAsset = investmentAmount
 			.add(evaluationProfit)
 			.add(cash);
-		
+
 		return new StockBalanceResponse(
 			totalAsset.toPlainString(),
 			investmentAmount.toPlainString(),
