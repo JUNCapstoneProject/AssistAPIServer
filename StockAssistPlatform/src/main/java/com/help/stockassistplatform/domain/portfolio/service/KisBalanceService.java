@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.help.stockassistplatform.domain.portfolio.dto.StockBalanceResponse;
+import com.help.stockassistplatform.domain.portfolio.dto.response.StockBalanceResponse;
 import com.help.stockassistplatform.global.config.properties.KisProperties;
 
 import lombok.RequiredArgsConstructor;

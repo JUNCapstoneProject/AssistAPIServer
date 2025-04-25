@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.help.stockassistplatform.domain.portfolio.dto.StockBalanceResponse;
+import com.help.stockassistplatform.domain.portfolio.dto.response.StockBalanceResponse;
 import com.help.stockassistplatform.domain.portfolio.service.KisBalanceService;
 import com.help.stockassistplatform.global.config.properties.KisProperties;
 

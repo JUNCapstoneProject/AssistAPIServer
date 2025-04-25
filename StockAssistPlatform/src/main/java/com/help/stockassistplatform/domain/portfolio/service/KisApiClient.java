@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.help.stockassistplatform.global.common.exception.CustomException;
 import com.help.stockassistplatform.global.common.exception.ErrorCode;
 import com.help.stockassistplatform.global.config.properties.KisProperties;
@@ -22,6 +23,7 @@ public class KisApiClient {
 	private static final String TR_ID_CASH = "VTTS3007R";
 
 	private final WebClient koreaInvestWebClient;
+	private final ObjectMapper objectMapper;
 	private final KisAuthService kisAuthService;
 
 	private final KisProperties kisProps;
