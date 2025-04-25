@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.help.stockassistplatform.domain.portfolio.dto.response.StockBalanceResponse;
 import com.help.stockassistplatform.domain.portfolio.service.KisBalanceService;
-import com.help.stockassistplatform.global.config.properties.KisProperties;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,8 +17,14 @@ import lombok.RequiredArgsConstructor;
 public class KisController {
 
 	private final KisBalanceService balanceService;
-	private final KisProperties kisProp;
 
+	/**
+	 * KIS API를 통해 주식 잔고를 조회합니다.
+	 *
+	 * @param excgCd 거래소 코드 (default: NASD)
+	 * @param currency 통화 코드 (default: USD)
+	 * @return 주식 잔고 정보
+	 */
 	@GetMapping("/portfolio")
 	public ResponseEntity<?> getBalance(
 		@RequestParam(defaultValue = "NASD") final String excgCd,
