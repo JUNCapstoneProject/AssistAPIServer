@@ -1,5 +1,5 @@
 # 1단계: 빌드 단계
-FROM gradle:8.13-jdk17.0.12 AS builder
+FROM gradle:8.13-jdk17 AS builder
 
 # 필요한 파일 복사
 COPY --chown=gradle:gradle ./StockAssistPlatform /home/gradle/AssistAPIServer
