@@ -21,7 +21,7 @@ services:
     container_name: stockassist-server
     restart: always
     ports:
-      - 8085:8080   # TODO: 추후 포트 번호 바꿔서 배포 예정
+      - 4003:4003   # TODO: 추후 포트 번호 바꿔서 배포 예정
     env_file:
       - .env
     environment:
