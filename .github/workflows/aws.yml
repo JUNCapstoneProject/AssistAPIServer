@@ -65,10 +65,12 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
+    # AWS 로그인
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
+    # Docker Build & Push
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
       env:
@@ -82,14 +84,28 @@ jobs:
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
+    # .aws/task-definition.json 파일을 불러와 environments 채움
+    # 이때 Github Repository secrets 활용
+    - name: Generate updated ECS task definition
+      run: |
+        sed -e "s|{{CRAWLING_DB_PASSWORD}}|${{ secrets.CRAWLING_DB_PASSWORD }}|g" \
+            -e "s|{{CRAWLING_DB_URL}}|${{ secrets.CRAWLING_DB_URL }}|g" \
+            -e "s|{{CRAWLING_DB_USER}}|${{ secrets.CRAWLING_DB_USER }}|g" \
+            -e "s|{{GMAIL_APP_PASSWORD}}|${{ secrets.GMAIL_APP_PASSWORD }}|g" \
+            -e "s|{{GMAIL_USERNAME}}|${{ secrets.GMAIL_USERNAME }}|g" \
+            -e "s|{{JWT_SECRET}}|${{ secrets.JWT_SECRET }}|g" \
+            ${{ env.ECS_TASK_DEFINITION }} > ecs-task-definition-updated.json
+
+    # 수정된 ecs-task-definition-updated.json에 new image ID를 채움
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION }}
+        task-definition: ecs-task-definition-updated.json
         container-name: ${{ env.CONTAINER_NAME }}
         image: ${{ steps.build-image.outputs.image }}
 
+    # 배포
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
