@@ -112,4 +112,5 @@ jobs:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
         service: ${{ env.ECS_SERVICE }}
         cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: true
+        force-new-deployment: true  # 기존 task는 더이상 사용하지 않으므로 종료
+        wait-for-service-stability: true  # 배포가 완료될 때까지 기다림
