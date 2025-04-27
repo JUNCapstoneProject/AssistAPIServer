@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  redis:
+    image: redis:7.4.2-alpine
+    container_name: redis-server
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_dev_data:/data
+    command: [ "redis-server", "--appendonly", "yes", "--appendfsync", "everysec" ]
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  stockassist:
+    image: 46112/tuzain:latest
+    container_name: stockassist-server
+    restart: always
+    ports:
+      - 8085:8080   # TODO: 추후 포트 번호 바꿔서 배포 예정
+    env_file:
+      - .env
+    environment:
+      - DB_URL=${DB_URL}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - CRAWLING_DB_URL=${CRAWLING_DB_URL}
+      - CRAWLING_DB_USER=${CRAWLING_DB_USER}
+      - CRAWLING_DB_PASSWORD=${CRAWLING_DB_PASSWORD}
+      - GMAIL_USERNAME=${GMAIL_USERNAME}
+      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - KIS_APP_KEY=${KIS_APP_KEY}
+      - KIS_APP_SECRET=${KIS_APP_SECRET}
+      - KIS_CANO=${KIS_CANO}
+      - KIS_ACNT_PRDT_CD=${KIS_ACNT_PRDT_CD}
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_PROFILES_ACTIVE=prod
+    depends_on:
+      redis:
+        condition: service_healthy
+
+volumes:
+  redis_dev_data:
+    external: true
