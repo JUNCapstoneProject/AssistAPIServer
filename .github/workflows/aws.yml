@@ -30,32 +30,23 @@ on:
   push:
     branches:
       - main
-  # workflow_run:
-  #   workflows: ["AssistAPIServer_CI"]
-  #   types:
-  #     - completed
 
 env:
-  AWS_REGION: ap-northeast-2                     # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: assist-api-server              # set this to your Amazon ECR repository name
-  ECS_SERVICE: assist-server-service             # set this to your Amazon ECS service name
-  ECS_CLUSTER: Tuzzain-Cluster                   # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: .aws/task-definition.json # set this to the path to your Amazon ECS task definition
-                                                 # file, e.g. .aws/task-definition.json
-  CONTAINER_NAME: AssistAPIServer                # set this to the name of the container in the
-                                                 # containerDefinitions section of your task definition
-
-permissions:
-  contents: read
+  AWS_REGION: ap-northeast-2                      # AWS region 설정
+  ECR_REPOSITORY: assist-api-server               # ECR 저장소 이름
+  ECS_SERVICE: assist-server-service              # ECS 서비스 이름
+  ECS_CLUSTER: Tuzzain-Cluster                    # ECS 클러스터 이름
+  ECS_TASK_DEFINITION: .aws/task-definition.json  # ECS 작업 정의 파일 경로
+  CONTAINER_NAME_1: stockassist                   # 첫 번째 컨테이너 이름 (stockassist)
+  CONTAINER_NAME_2: redis                         # 두 번째 컨테이너 이름 (redis)
 
 jobs:
   deploy:
-    name: Deploy
     runs-on: ubuntu-latest
     environment: production
 
     steps:
-    - name: Checkout
+    - name: Checkout code
       uses: actions/checkout@v4
 
     - name: Configure AWS credentials
@@ -65,52 +56,69 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
-    # AWS 로그인
+    # 로그인
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    # Docker Build & Push
+    # Docker 빌드 및 푸시
     - name: Build, tag, and push image to Amazon ECR
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        # Build a docker container and
-        # push it to ECR so that it can
-        # be deployed to ECS.
-        docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-    # .aws/task-definition.json 파일을 불러와 environments 채움
-    # 이때 Github Repository secrets 활용
+    # 환경변수 치환을 위한 JSON-safe 값으로 변환
     - name: Generate updated ECS task definition
       run: |
-        sed -e "s|{{CRAWLING_DB_PASSWORD}}|${{ secrets.CRAWLING_DB_PASSWORD }}|g" \
-            -e "s|{{CRAWLING_DB_URL}}|${{ secrets.CRAWLING_DB_URL }}|g" \
-            -e "s|{{CRAWLING_DB_USER}}|${{ secrets.CRAWLING_DB_USER }}|g" \
-            -e "s|{{GMAIL_APP_PASSWORD}}|${{ secrets.GMAIL_APP_PASSWORD }}|g" \
-            -e "s|{{GMAIL_USERNAME}}|${{ secrets.GMAIL_USERNAME }}|g" \
-            -e "s|{{JWT_SECRET}}|${{ secrets.JWT_SECRET }}|g" \
+        # 비밀 값들을 JSON-safe 값으로 변환
+        CRAWLING_DB_PASSWORD_ESCAPED=$(echo "${{ secrets.CRAWLING_DB_PASSWORD }}" | jq -Rsa .)
+        CRAWLING_DB_URL_ESCAPED=$(echo "${{ secrets.CRAWLING_DB_URL }}" | jq -Rsa .)
+        CRAWLING_DB_USER_ESCAPED=$(echo "${{ secrets.CRAWLING_DB_USER }}" | jq -Rsa .)
+        GMAIL_APP_PASSWORD_ESCAPED=$(echo "${{ secrets.GMAIL_APP_PASSWORD }}" | jq -Rsa .)
+        GMAIL_USERNAME_ESCAPED=$(echo "${{ secrets.GMAIL_USERNAME }}" | jq -Rsa .)
+        JWT_SECRET_ESCAPED=$(echo "${{ secrets.JWT_SECRET }}" | jq -Rsa .)
+    
+        # task definition에서 환경변수를 치환
+        sed -e "s|{{DB_URL}}|${{ secrets.DB_URL }}|g" \
+            -e "s|{{DB_USER}}|${{ secrets.DB_USER }}|g" \
+            -e "s|{{DB_PASSWORD}}|${{ secrets.DB_PASSWORD }}|g" \
+            -e "s|{{CRAWLING_DB_URL}}|$CRAWLING_DB_URL_ESCAPED|g" \
+            -e "s|{{CRAWLING_DB_USER}}|$CRAWLING_DB_USER_ESCAPED|g" \
+            -e "s|{{CRAWLING_DB_PASSWORD}}|$CRAWLING_DB_PASSWORD_ESCAPED|g" \
+            -e "s|{{GMAIL_APP_PASSWORD}}|$GMAIL_APP_PASSWORD_ESCAPED|g" \
+            -e "s|{{GMAIL_USERNAME}}|$GMAIL_USERNAME_ESCAPED|g" \
+            -e "s|{{JWT_SECRET}}|$JWT_SECRET_ESCAPED|g" \
             ${{ env.ECS_TASK_DEFINITION }} > ecs-task-definition-updated.json
 
-    # 수정된 ecs-task-definition-updated.json에 new image ID를 채움
+    # 수정된 ecs-task-definition-updated.json에 새 이미지 ID를 채움
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
         task-definition: ecs-task-definition-updated.json
-        container-name: ${{ env.CONTAINER_NAME }}
+        container-name: ${{ env.CONTAINER_NAME_1 }}   # 첫 번째 컨테이너 이름 (stockassist)
         image: ${{ steps.build-image.outputs.image }}
 
-    # 배포
+    # 두 번째 컨테이너(redis)에 대해 동일한 작업
+    - name: Fill in the image ID for the Redis container
+      id: task-def-redis
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ecs-task-definition-updated.json
+        container-name: ${{ env.CONTAINER_NAME_2 }}   # 두 번째 컨테이너 이름 (redis)
+        image: ${{ steps.build-image.outputs.image }}
+
+    # ECS에 배포
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
         service: ${{ env.ECS_SERVICE }}
         cluster: ${{ env.ECS_CLUSTER }}
-        force-new-deployment: true  # 기존 task는 더이상 사용하지 않으므로 종료
+        force-new-deployment: true   # 기존 task는 더이상 사용하지 않으므로 종료
         wait-for-service-stability: true  # 배포가 완료될 때까지 기다림
