@@ -22,8 +22,6 @@ services:
     restart: always
     ports:
       - 4003:4003   # TODO: 추후 포트 번호 바꿔서 배포 예정
-    env_file:
-      - .env
     environment:
       - DB_URL=${DB_URL}
       - DB_USER=${DB_USER}
