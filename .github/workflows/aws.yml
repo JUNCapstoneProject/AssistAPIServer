@@ -61,15 +61,20 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    # Docker 빌드 및 푸시
-    - name: Build, tag, and push image to Amazon ECR
+    # Docker Compose 빌드 및 푸시
+    - name: Build, tag, and push images using Docker Compose
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        # Docker Compose로 빌드
+        docker-compose -f docker-compose.yml build
+        
+        # Docker Compose로 푸시 (여러 컨테이너를 한번에 푸시)
+        docker-compose -f docker-compose.yml push
+        
+        # 푸시된 이미지를 GitHub output으로 전달
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
     # 환경변수 치환을 위한 JSON-safe 값으로 변환
