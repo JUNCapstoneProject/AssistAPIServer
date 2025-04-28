@@ -91,12 +91,12 @@ jobs:
             {"name": "DB_URL", "value": "'"${{ secrets.DB_URL }}"'"},
             {"name": "DB_USER", "value": "'"${{ secrets.DB_USER }}"'"},
             {"name": "DB_PASSWORD", "value": "'"${{ secrets.DB_PASSWORD }}"'"},
-            {"name": "CRAWLING_DB_URL", "value": "'"$CRAWLING_DB_URL_ESCAPED"'"},
-            {"name": "CRAWLING_DB_USER", "value": "'"$CRAWLING_DB_USER_ESCAPED"'"},
-            {"name": "CRAWLING_DB_PASSWORD", "value": "'"$CRAWLING_DB_PASSWORD_ESCAPED"'"},
-            {"name": "GMAIL_APP_PASSWORD", "value": "'"$GMAIL_APP_PASSWORD_ESCAPED"'"},
-            {"name": "GMAIL_USERNAME", "value": "'"$GMAIL_USERNAME_ESCAPED"'"},
-            {"name": "JWT_SECRET", "value": "'"$JWT_SECRET_ESCAPED"'"}
+            {"name": "CRAWLING_DB_URL", "value": "'"$CRAWLING_DB_URL"'"},
+            {"name": "CRAWLING_DB_USER", "value": "'"$CRAWLING_DB_USER"'"},
+            {"name": "CRAWLING_DB_PASSWORD", "value": "'"$CRAWLING_DB_PASSWOR"'"},
+            {"name": "GMAIL_APP_PASSWORD", "value": "'"$GMAIL_APP_PASSWORD"'"},
+            {"name": "GMAIL_USERNAME", "value": "'"$GMAIL_USERNAME"'"},
+            {"name": "JWT_SECRET", "value": "'"$JWT_SECRET"'"}
           ]' ${{ env.ECS_TASK_DEFINITION }} > ecs-task-definition-updated.json
 
 
