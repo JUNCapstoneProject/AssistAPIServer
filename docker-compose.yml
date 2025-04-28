@@ -1,7 +1,5 @@
 services:
   redis:
-    build:
-      context: ./redis  # redis 디렉토리에서 Dockerfile을 기반으로 빌드
     image: redis:7.4.2-alpine  # 기본 이미지를 사용하지만, 빌드를 명시적으로 추가
     container_name: redis-server
     restart: always
