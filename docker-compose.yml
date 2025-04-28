@@ -1,10 +1,10 @@
 services:
   redis:
     image: redis:7.4.2-alpine
-    container_name: redis-server
+    container_name: redis-server_1
     restart: always
     ports:
-      - 6379:6379
+      - 63794:63794
     volumes:
       - redis_dev_data:/data
     command: [ "redis-server", "--appendonly", "yes", "--appendfsync", "everysec" ]
@@ -16,10 +16,10 @@ services:
 
   stockassist:
     image: 46112/tuzain:latest
-    container_name: stockassist-server
+    container_name: stockassist-server_1
     restart: always
     ports:
-      - 4003:4003   # TODO: 추후 포트 번호 바꿔서 배포 예정
+      - 40034:40034
     environment:
       - DB_URL=${DB_URL}
       - DB_USER=${DB_USER}
