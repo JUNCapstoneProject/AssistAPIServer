@@ -83,42 +83,21 @@ jobs:
         # 푸시된 이미지를 GitHub output으로 전달
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
-    # 환경변수 치환을 위한 JSON-safe 값으로 변환
-    - name: Generate updated ECS task definition
+    # 환경변수를 JSON 파일에 추가하는 부분
+    - name: Update ECS task definition with environment variables
       run: |
-        # 비밀 값들을 JSON-safe 값으로 변환
-        CRAWLING_DB_PASSWORD_ESCAPED=$(echo "${{ secrets.CRAWLING_DB_PASSWORD }}" | jq -Rsa .)
-        CRAWLING_DB_URL_ESCAPED=$(echo "${{ secrets.CRAWLING_DB_URL }}" | jq -Rsa .)
-        CRAWLING_DB_USER_ESCAPED=$(echo "${{ secrets.CRAWLING_DB_USER }}" | jq -Rsa .)
-        GMAIL_APP_PASSWORD_ESCAPED=$(echo "${{ secrets.GMAIL_APP_PASSWORD }}" | jq -Rsa .)
-        GMAIL_USERNAME_ESCAPED=$(echo "${{ secrets.GMAIL_USERNAME }}" | jq -Rsa .)
-        JWT_SECRET_ESCAPED=$(echo "${{ secrets.JWT_SECRET }}" | jq -Rsa .)
-      
-        # task definition에서 환경변수를 치환
-        sed -e "s|{{DB_URL}}|${{ secrets.DB_URL }}|g" \
-            -e "s|{{DB_USER}}|${{ secrets.DB_USER }}|g" \
-            -e "s|{{DB_PASSWORD}}|${{ secrets.DB_PASSWORD }}|g" \
-            -e "s|{{CRAWLING_DB_URL}}|$CRAWLING_DB_URL_ESCAPED|g" \
-            -e "s|{{CRAWLING_DB_USER}}|$CRAWLING_DB_USER_ESCAPED|g" \
-            -e "s|{{CRAWLING_DB_PASSWORD}}|$CRAWLING_DB_PASSWORD_ESCAPED|g" \
-            -e "s|{{GMAIL_APP_PASSWORD}}|$GMAIL_APP_PASSWORD_ESCAPED|g" \
-            -e "s|{{GMAIL_USERNAME}}|$GMAIL_USERNAME_ESCAPED|g" \
-            -e "s|{{JWT_SECRET}}|$JWT_SECRET_ESCAPED|g" \
-            ${{ env.ECS_TASK_DEFINITION }} > ecs-task-definition-updated.json
-    
-        # 실제 환경변수 삽입 (추가)
-        sed -i '/"name": "redis",/a \
-        "environment": [ \
-            {"name": "DB_URL", "value": "'"${{ secrets.DB_URL }}"'"}, \
-            {"name": "DB_USER", "value": "'"${{ secrets.DB_USER }}"'"}, \
-            {"name": "DB_PASSWORD", "value": "'"${{ secrets.DB_PASSWORD }}"'"}, \
-            {"name": "CRAWLING_DB_URL", "value": "'"$CRAWLING_DB_URL_ESCAPED"'"}, \
-            {"name": "CRAWLING_DB_USER", "value": "'"$CRAWLING_DB_USER_ESCAPED"'"}, \
-            {"name": "CRAWLING_DB_PASSWORD", "value": "'"$CRAWLING_DB_PASSWORD_ESCAPED"'"}, \
-            {"name": "GMAIL_APP_PASSWORD", "value": "'"$GMAIL_APP_PASSWORD_ESCAPED"'"}, \
-            {"name": "GMAIL_USERNAME", "value": "'"$GMAIL_USERNAME_ESCAPED"'"}, \
-            {"name": "JWT_SECRET", "value": "'"$JWT_SECRET_ESCAPED"'"}, \
-        ]' ecs-task-definition-updated.json
+        # 환경변수 값을 JSON-safe로 처리하여 환경변수 추가
+        jq '(.containerDefinitions[] | select(.name == "redis") | .environment) += [
+            {"name": "DB_URL", "value": "'"${{ secrets.DB_URL }}"'"},
+            {"name": "DB_USER", "value": "'"${{ secrets.DB_USER }}"'"},
+            {"name": "DB_PASSWORD", "value": "'"${{ secrets.DB_PASSWORD }}"'"},
+            {"name": "CRAWLING_DB_URL", "value": "'"$CRAWLING_DB_URL_ESCAPED"'"},
+            {"name": "CRAWLING_DB_USER", "value": "'"$CRAWLING_DB_USER_ESCAPED"'"},
+            {"name": "CRAWLING_DB_PASSWORD", "value": "'"$CRAWLING_DB_PASSWORD_ESCAPED"'"},
+            {"name": "GMAIL_APP_PASSWORD", "value": "'"$GMAIL_APP_PASSWORD_ESCAPED"'"},
+            {"name": "GMAIL_USERNAME", "value": "'"$GMAIL_USERNAME_ESCAPED"'"},
+            {"name": "JWT_SECRET", "value": "'"$JWT_SECRET_ESCAPED"'"}
+          ]' ${{ env.ECS_TASK_DEFINITION }} > ecs-task-definition-updated.json
 
 
     # 수정된 ecs-task-definition-updated.json에 새 이미지 ID를 채움
