@@ -108,17 +108,17 @@ jobs:
     
         # 실제 환경변수 삽입 (추가)
         sed -i '/"name": "redis",/a \
-        "environment": [ \
-            {"name": "DB_URL", "value": "'${{ secrets.DB_URL }}'"}, \
-            {"name": "DB_USER", "value": "'${{ secrets.DB_USER }}'"}, \
-            {"name": "DB_PASSWORD", "value": "'${{ secrets.DB_PASSWORD }}'"}, \
-            {"name": "CRAWLING_DB_URL", "value": "'$CRAWLING_DB_URL_ESCAPED'"}, \
-            {"name": "CRAWLING_DB_USER", "value": "'$CRAWLING_DB_USER_ESCAPED'"}, \
-            {"name": "CRAWLING_DB_PASSWORD", "value": "'$CRAWLING_DB_PASSWORD_ESCAPED'"}, \
-            {"name": "GMAIL_APP_PASSWORD", "value": "'$GMAIL_APP_PASSWORD_ESCAPED'"}, \
-            {"name": "GMAIL_USERNAME", "value": "'$GMAIL_USERNAME_ESCAPED'"}, \
-            {"name": "JWT_SECRET", "value": "'$JWT_SECRET_ESCAPED'"} \
-        ],' ecs-task-definition-updated.json
+          "environment": [ \
+              {"name": "DB_URL", "value": "'${{ secrets.DB_URL }}'"}, \
+              {"name": "DB_USER", "value": "'${{ secrets.DB_USER }}'"}, \
+              {"name": "DB_PASSWORD", "value": "'${{ secrets.DB_PASSWORD }}'"}, \
+              {"name": "CRAWLING_DB_URL", "value": "'$CRAWLING_DB_URL_ESCAPED'"}, \
+              {"name": "CRAWLING_DB_USER", "value": "'$CRAWLING_DB_USER_ESCAPED'"}, \
+              {"name": "CRAWLING_DB_PASSWORD", "value": "'$CRAWLING_DB_PASSWORD_ESCAPED'"}, \
+              {"name": "GMAIL_APP_PASSWORD", "value": "'$GMAIL_APP_PASSWORD_ESCAPED'"}, \
+              {"name": "GMAIL_USERNAME", "value": "'$GMAIL_USERNAME_ESCAPED'"}, \
+              {"name": "JWT_SECRET", "value": "'$JWT_SECRET_ESCAPED'"} \
+          ]' ecs-task-definition-updated.json
 
     # 수정된 ecs-task-definition-updated.json에 새 이미지 ID를 채움
     - name: Fill in the new image ID in the Amazon ECS task definition
