@@ -17,7 +17,6 @@ services:
   stockassist:
     build:
       context: ./
-    image: 46112/tuzain:latest  # 이미지를 새로 빌드하거나 해당 이미지를 사용
     container_name: stockassist-server
     restart: always
     ports:
