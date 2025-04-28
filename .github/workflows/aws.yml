@@ -87,7 +87,7 @@ jobs:
     - name: Update ECS task definition with environment variables
       run: |
         # 환경변수 값을 JSON-safe로 처리하여 환경변수 추가
-        jq '(.containerDefinitions[] | select(.name == "redis") | .environment) += [
+        jq '(.containerDefinitions[] | select(.name == "stockassist") | .environment) += [
             {"name": "DB_URL", "value": "'"${{ secrets.DB_URL }}"'"},
             {"name": "DB_USER", "value": "'"${{ secrets.DB_USER }}"'"},
             {"name": "DB_PASSWORD", "value": "'"${{ secrets.DB_PASSWORD }}"'"},
@@ -96,7 +96,11 @@ jobs:
             {"name": "CRAWLING_DB_PASSWORD", "value": "'"$CRAWLING_DB_PASSWOR"'"},
             {"name": "GMAIL_APP_PASSWORD", "value": "'"$GMAIL_APP_PASSWORD"'"},
             {"name": "GMAIL_USERNAME", "value": "'"$GMAIL_USERNAME"'"},
-            {"name": "JWT_SECRET", "value": "'"$JWT_SECRET"'"}
+            {"name": "JWT_SECRET", "value": "'"$JWT_SECRET"'"},
+            {"name": "KIS_ACNT_PRDT_CD", "value": "'"$KIS_ACNT_PRDT_CD"'"},
+            {"name": "KIS_APP_KEY", "value": "'"$KIS_APP_KEY"'"},
+            {"name": "KIS_APP_SECRET", "value": "'"$KIS_APP_SECRET"'"},
+            {"name": "KIS_CANO", "value": "'"$KIS_CANO"'"}
           ]' ${{ env.ECS_TASK_DEFINITION }} > ecs-task-definition-updated.json
 
 
