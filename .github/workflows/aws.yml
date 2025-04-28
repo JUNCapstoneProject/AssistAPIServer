@@ -36,7 +36,8 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
-  ECR_REPOSITORY: assist-api-server  # 동일한 ECR 리포지토리 사용
+  ECR_REPOSITORY: assist-api-server
+  ECR_REPOSITORY_REDIS: assist-api-server-redis
   ECS_SERVICE: assist-server-service
   ECS_CLUSTER: Tuzzain-Cluster
   ECS_TASK_DEFINITION: .aws/task-definition.json
@@ -91,7 +92,8 @@ jobs:
       run: |
         docker-compose -f docker-compose.yml build --no-cache --force-rm
         docker-compose -f docker-compose.yml push
-        echo "image=${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}" >> $GITHUB_OUTPUT
+        echo "stockassist_image=${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}" >> $GITHUB_OUTPUT
+        echo "redis_image=${ECR_REGISTRY}/${ECR_REPOSITORY_REDIS}:${IMAGE_TAG}" >> $GITHUB_OUTPUT
 
     - name: Update ECS task definition with environment variables
       run: |
@@ -130,7 +132,7 @@ jobs:
       with:
         task-definition: ecs-task-definition-updated.json
         container-name: ${{ env.CONTAINER_NAME_1 }}
-        image: ${{ steps.build-image.outputs.image }}
+        image: ${{ steps.build-image.outputs.stockassist_image }}
 
     - name: Fill in image for redis container
       id: task-def-final
@@ -138,7 +140,7 @@ jobs:
       with:
         task-definition: ${{ steps.task-def-stockassist.outputs.task-definition }}
         container-name: ${{ env.CONTAINER_NAME_2 }}
-        image: ${{ steps.build-image.outputs.image }}
+        image: ${{ steps.build-image.outputs.redis_image }}
 
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
