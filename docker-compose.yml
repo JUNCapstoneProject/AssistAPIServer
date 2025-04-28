@@ -2,7 +2,7 @@ services:
   redis:
     build:
         context: ./redis
-    image: redis:7.4.2-alpine  # 기본 이미지를 사용하지만, 빌드를 명시적으로 추가
+    image: ${ECR_REGISTRY}/${ECR_REPOSITORY_REDIS}:${IMAGE_TAG}
     container_name: redis-server
     restart: always
     ports:
