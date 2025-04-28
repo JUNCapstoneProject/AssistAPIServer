@@ -17,6 +17,7 @@ services:
   stockassist:
     build:
       context: ./
+    image: ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
     container_name: stockassist-server
     restart: always
     ports:
