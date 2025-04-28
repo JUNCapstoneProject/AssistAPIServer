@@ -7,6 +7,9 @@ import java.util.Optional;
 
 import com.help.stockassistplatform.domain.news.entity.NewsView;
 
+import lombok.Getter;
+
+@Getter
 public class NewsResponseDto {
 	private String category;
 	private String status;
