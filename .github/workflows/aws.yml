@@ -30,32 +30,26 @@ on:
   push:
     branches:
       - main
-  # workflow_run:
-  #   workflows: ["AssistAPIServer_CI"]
-  #   types:
-  #     - completed
+  pull_request:
+    branches:
+      - main
 
 env:
-  AWS_REGION: ap-northeast-2                     # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: assist-api-server              # set this to your Amazon ECR repository name
-  ECS_SERVICE: assist-server-service             # set this to your Amazon ECS service name
-  ECS_CLUSTER: Tuzzain-Cluster                   # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: .aws/task-definition.json # set this to the path to your Amazon ECS task definition
-                                                 # file, e.g. .aws/task-definition.json
-  CONTAINER_NAME: AssistAPIServer                # set this to the name of the container in the
-                                                 # containerDefinitions section of your task definition
-
-permissions:
-  contents: read
+  AWS_REGION: ap-northeast-2                      # AWS region 설정
+  ECR_REPOSITORY: assist-api-server               # ECR 저장소 이름
+  ECS_SERVICE: assist-server-service              # ECS 서비스 이름
+  ECS_CLUSTER: Tuzzain-Cluster                    # ECS 클러스터 이름
+  ECS_TASK_DEFINITION: .aws/task-definition.json  # ECS 작업 정의 파일 경로
+  CONTAINER_NAME_1: stockassist                   # 첫 번째 컨테이너 이름 (stockassist)
+  CONTAINER_NAME_2: redis                         # 두 번째 컨테이너 이름 (redis)
 
 jobs:
   deploy:
-    name: Deploy
     runs-on: ubuntu-latest
     environment: production
 
     steps:
-    - name: Checkout
+    - name: Checkout code
       uses: actions/checkout@v4
 
     - name: Configure AWS credentials
@@ -65,35 +59,78 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
+    # 로그인
     - name: Login to Amazon ECR
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build, tag, and push image to Amazon ECR
+    # docker-compose 설치
+    - name: Install Docker Compose
+      run: |
+        sudo curl -L "https://github.com/docker/compose/releases/download/$(curl -s https://api.github.com/repos/docker/compose/releases/latest | jq -r .tag_name)/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+        sudo chmod +x /usr/local/bin/docker-compose
+
+    # docker-compose 빌드 및 푸시
+    - name: Build, tag, and push images using Docker Compose
       id: build-image
       env:
         ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         IMAGE_TAG: ${{ github.sha }}
       run: |
-        # Build a docker container and
-        # push it to ECR so that it can
-        # be deployed to ECS.
-        docker build -f Dockerfile -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        # Docker Compose로 빌드
+        docker-compose -f docker-compose.yml build
+        
+        # Docker Compose로 푸시 (여러 컨테이너를 한번에 푸시)
+        docker-compose -f docker-compose.yml push
+        
+        # 푸시된 이미지를 GitHub output으로 전달
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
+    # 환경변수를 JSON 파일에 추가하는 부분
+    - name: Update ECS task definition with environment variables
+      run: |
+        # 환경변수 값을 JSON-safe로 처리하여 환경변수 추가
+        jq '(.containerDefinitions[] | select(.name == "stockassist") | .environment) += [
+            {"name": "DB_URL", "value": "'"${{ secrets.DB_URL }}"'"},
+            {"name": "DB_USER", "value": "'"${{ secrets.DB_USER }}"'"},
+            {"name": "DB_PASSWORD", "value": "'"${{ secrets.DB_PASSWORD }}"'"},
+            {"name": "CRAWLING_DB_URL", "value": "'"$CRAWLING_DB_URL"'"},
+            {"name": "CRAWLING_DB_USER", "value": "'"$CRAWLING_DB_USER"'"},
+            {"name": "CRAWLING_DB_PASSWORD", "value": "'"$CRAWLING_DB_PASSWOR"'"},
+            {"name": "GMAIL_APP_PASSWORD", "value": "'"$GMAIL_APP_PASSWORD"'"},
+            {"name": "GMAIL_USERNAME", "value": "'"$GMAIL_USERNAME"'"},
+            {"name": "JWT_SECRET", "value": "'"$JWT_SECRET"'"},
+            {"name": "KIS_ACNT_PRDT_CD", "value": "'"$KIS_ACNT_PRDT_CD"'"},
+            {"name": "KIS_APP_KEY", "value": "'"$KIS_APP_KEY"'"},
+            {"name": "KIS_APP_SECRET", "value": "'"$KIS_APP_SECRET"'"},
+            {"name": "KIS_CANO", "value": "'"$KIS_CANO"'"}
+          ]' ${{ env.ECS_TASK_DEFINITION }} > ecs-task-definition-updated.json
+
+
+    # 수정된 ecs-task-definition-updated.json에 새 이미지 ID를 채움
     - name: Fill in the new image ID in the Amazon ECS task definition
       id: task-def
       uses: aws-actions/amazon-ecs-render-task-definition@v1
       with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION }}
-        container-name: ${{ env.CONTAINER_NAME }}
+        task-definition: ecs-task-definition-updated.json
+        container-name: ${{ env.CONTAINER_NAME_1 }}   # 첫 번째 컨테이너 이름 (stockassist)
         image: ${{ steps.build-image.outputs.image }}
 
+    # 두 번째 컨테이너(redis)에 대해 동일한 작업
+    - name: Fill in the image ID for the Redis container
+      id: task-def-redis
+      uses: aws-actions/amazon-ecs-render-task-definition@v1
+      with:
+        task-definition: ecs-task-definition-updated.json
+        container-name: ${{ env.CONTAINER_NAME_2 }}   # 두 번째 컨테이너 이름 (redis)
+        image: ${{ steps.build-image.outputs.image }}
+
+    # ECS에 배포
     - name: Deploy Amazon ECS task definition
       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
       with:
         task-definition: ${{ steps.task-def.outputs.task-definition }}
         service: ${{ env.ECS_SERVICE }}
         cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: true
+        force-new-deployment: true   # 기존 task는 더이상 사용하지 않으므로 종료
+        wait-for-service-stability: true  # 배포가 완료될 때까지 기다림
