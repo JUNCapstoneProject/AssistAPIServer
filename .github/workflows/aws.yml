@@ -90,7 +90,7 @@ jobs:
         IMAGE_TAG: ${{ github.sha }}
       run: |
         docker-compose -f docker-compose.yml build --no-cache
-        docker-compose -f docker-compose.yml push --no-cache
+        docker-compose -f docker-compose.yml push
         echo "image=${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}" >> $GITHUB_OUTPUT
 
     - name: Update ECS task definition with environment variables
