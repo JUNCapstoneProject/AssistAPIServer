@@ -42,6 +42,20 @@ env:
   ECS_TASK_DEFINITION: .aws/task-definition.json  # ECS 작업 정의 파일 경로
   CONTAINER_NAME_1: stockassist                   # 첫 번째 컨테이너 이름 (stockassist)
   CONTAINER_NAME_2: redis                         # 두 번째 컨테이너 이름 (redis)
+  # 깃 환경변수들들
+  DB_URL: ${{ secrets.DB_URL }}
+  DB_USER: ${{ secrets.DB_USER }}
+  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  CRAWLING_DB_URL: ${{ secrets.CRAWLING_DB_URL }}
+  CRAWLING_DB_USER: ${{ secrets.CRAWLING_DB_USER }}
+  CRAWLING_DB_PASSWORD: ${{ secrets.CRAWLING_DB_PASSWORD }}
+  GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+  GMAIL_USERNAME: ${{ secrets.GMAIL_USERNAME }}
+  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+  KIS_ACNT_PRDT_CD: ${{ secrets.KIS_ACNT_PRDT_CD }}
+  KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
+  KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
+  KIS_CANO: ${{ secrets.KIS_CANO }}
 
 jobs:
   deploy:
@@ -79,32 +93,42 @@ jobs:
       run: |
         # Docker Compose로 빌드
         docker-compose -f docker-compose.yml build
-        
         # Docker Compose로 푸시 (여러 컨테이너를 한번에 푸시)
         docker-compose -f docker-compose.yml push
-        
         # 푸시된 이미지를 GitHub output으로 전달
         echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
     # 환경변수를 JSON 파일에 추가하는 부분
     - name: Update ECS task definition with environment variables
       run: |
-        # 환경변수 값을 JSON-safe로 처리하여 환경변수 추가
-        jq '(.containerDefinitions[] | select(.name == "stockassist") | .environment) += [
-            {"name": "DB_URL", "value": "'"${{ secrets.DB_URL }}"'"},
-            {"name": "DB_USER", "value": "'"${{ secrets.DB_USER }}"'"},
-            {"name": "DB_PASSWORD", "value": "'"${{ secrets.DB_PASSWORD }}"'"},
-            {"name": "CRAWLING_DB_URL", "value": "'"$CRAWLING_DB_URL"'"},
-            {"name": "CRAWLING_DB_USER", "value": "'"$CRAWLING_DB_USER"'"},
-            {"name": "CRAWLING_DB_PASSWORD", "value": "'"$CRAWLING_DB_PASSWOR"'"},
-            {"name": "GMAIL_APP_PASSWORD", "value": "'"$GMAIL_APP_PASSWORD"'"},
-            {"name": "GMAIL_USERNAME", "value": "'"$GMAIL_USERNAME"'"},
-            {"name": "JWT_SECRET", "value": "'"$JWT_SECRET"'"},
-            {"name": "KIS_ACNT_PRDT_CD", "value": "'"$KIS_ACNT_PRDT_CD"'"},
-            {"name": "KIS_APP_KEY", "value": "'"$KIS_APP_KEY"'"},
-            {"name": "KIS_APP_SECRET", "value": "'"$KIS_APP_SECRET"'"},
-            {"name": "KIS_CANO", "value": "'"$KIS_CANO"'"}
-          ]' ${{ env.ECS_TASK_DEFINITION }} > ecs-task-definition-updated.json
+        jq --arg DB_URL "$DB_URL" \
+           --arg DB_USER "$DB_USER" \
+           --arg DB_PASSWORD "$DB_PASSWORD" \
+           --arg CRAWLING_DB_URL "$CRAWLING_DB_URL" \
+           --arg CRAWLING_DB_USER "$CRAWLING_DB_USER" \
+           --arg CRAWLING_DB_PASSWORD "$CRAWLING_DB_PASSWORD" \
+           --arg GMAIL_APP_PASSWORD "$GMAIL_APP_PASSWORD" \
+           --arg GMAIL_USERNAME "$GMAIL_USERNAME" \
+           --arg JWT_SECRET "$JWT_SECRET" \
+           --arg KIS_ACNT_PRDT_CD "$KIS_ACNT_PRDT_CD" \
+           --arg KIS_APP_KEY "$KIS_APP_KEY" \
+           --arg KIS_APP_SECRET "$KIS_APP_SECRET" \
+           --arg KIS_CANO "$KIS_CANO" \
+           '(.containerDefinitions[] | select(.name == "stockassist") | .environment) += [
+             {"name": "DB_URL", "value": $DB_URL},
+             {"name": "DB_USER", "value": $DB_USER},
+             {"name": "DB_PASSWORD", "value": $DB_PASSWORD},
+             {"name": "CRAWLING_DB_URL", "value": $CRAWLING_DB_URL},
+             {"name": "CRAWLING_DB_USER", "value": $CRAWLING_DB_USER},
+             {"name": "CRAWLING_DB_PASSWORD", "value": $CRAWLING_DB_PASSWORD},
+             {"name": "GMAIL_APP_PASSWORD", "value": $GMAIL_APP_PASSWORD},
+             {"name": "GMAIL_USERNAME", "value": $GMAIL_USERNAME},
+             {"name": "JWT_SECRET", "value": $JWT_SECRET},
+             {"name": "KIS_ACNT_PRDT_CD", "value": $KIS_ACNT_PRDT_CD},
+             {"name": "KIS_APP_KEY", "value": $KIS_APP_KEY},
+             {"name": "KIS_APP_SECRET", "value": $KIS_APP_SECRET},
+             {"name": "KIS_CANO", "value": $KIS_CANO}
+           ]' "$ECS_TASK_DEFINITION" > ecs-task-definition-updated.json
 
 
     # 수정된 ecs-task-definition-updated.json에 새 이미지 ID를 채움
