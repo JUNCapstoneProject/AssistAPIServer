@@ -36,7 +36,7 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
-  ECR_REPOSITORY: assist-api-server
+  ECR_REPOSITORY: assist-api-server  # 동일한 ECR 리포지토리 사용
   ECS_SERVICE: assist-server-service
   ECS_CLUSTER: Tuzzain-Cluster
   ECS_TASK_DEFINITION: .aws/task-definition.json
