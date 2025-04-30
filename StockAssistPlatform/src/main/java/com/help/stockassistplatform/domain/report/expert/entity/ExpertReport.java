@@ -27,7 +27,7 @@ public class ExpertReport {
 	@Column(name = "transed_title")
 	private String transedTitle;
 
-	private int hits;
+	private Integer hits;
 	private String author;
 
 	@Column(name = "posted_at")
