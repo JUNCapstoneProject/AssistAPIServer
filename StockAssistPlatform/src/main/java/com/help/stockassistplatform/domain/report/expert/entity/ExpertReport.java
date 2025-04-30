@@ -20,7 +20,7 @@ public class ExpertReport {
 
 	@Id
 	@Column(name = "crawling_id")
-	private Long id;
+	private String id;
 
 	private String title;
 
