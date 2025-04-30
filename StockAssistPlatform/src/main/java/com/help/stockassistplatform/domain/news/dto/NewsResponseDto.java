@@ -33,7 +33,7 @@ public class NewsResponseDto {
 		dto.category = Optional.ofNullable(newsView.getTag()).orElse("기타");
 		dto.status = newsView.getAiAnalysis();
 		dto.title = newsView.getTitle();
-		dto.description = newsView.getContent();
+		dto.description = smartTruncate(newsView.getContent(), 100);
 		dto.source = newsView.getOrganization();
 		dto.date = formatDate(newsView.getPostedAt());
 		dto.link = newsView.getUrl();
@@ -46,5 +46,14 @@ public class NewsResponseDto {
 		}
 		final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd", Locale.KOREA);
 		return dateTime.format(formatter);
+	}
+
+	private static String smartTruncate(final String text, final int maxLength) {
+		if (null == text || text.length() <= maxLength)
+			return text;
+		final int lastSpace = text.lastIndexOf(" ", maxLength);
+		if (-1 == lastSpace)
+			return text.substring(0, maxLength) + "...";
+		return text.substring(0, lastSpace) + "...";
 	}
 }
