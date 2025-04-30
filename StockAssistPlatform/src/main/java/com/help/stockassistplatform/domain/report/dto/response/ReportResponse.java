@@ -1,6 +1,8 @@
 package com.help.stockassistplatform.domain.report.dto.response;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -14,7 +16,7 @@ public record ReportResponse(
 	String source,
 	String title,
 	String description,
-	LocalDateTime date,
+	String date,
 	String link
 ) {
 
@@ -25,7 +27,7 @@ public record ReportResponse(
 			report.getAuthor(),
 			report.getTitle(),
 			summarize(report.getContent()),
-			report.getDate(),
+			formatDate(report.getDate()),
 			report.getLink()
 		);
 	}
@@ -37,13 +39,21 @@ public record ReportResponse(
 			report.getWriterNickname(),
 			report.getTitle(),
 			summarize(report.getContent()),
-			report.getCreatedAt(),
+			formatDate(report.getCreatedAt()),
 			null
 		);
 	}
 
 	private static String summarize(final String content) {
 		return null != content ? content.substring(0, Math.min(100, content.length())) + "..." : "";
+	}
+
+	private static String formatDate(final LocalDateTime dateTime) {
+		if (null == dateTime) {
+			return "";
+		}
+		final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd", Locale.KOREA);
+		return dateTime.format(formatter);
 	}
 }
 
