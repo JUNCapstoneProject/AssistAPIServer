@@ -27,7 +27,7 @@ public class JwtUtil {
 	private static final String ACCESS_HEADER = "Authorization";
 	private static final String ACCESS_TOKEN = "AccessToken";
 	private static final String TOKEN_PREFIX = "Bearer ";
-	private static final Long ACCESS_TOKEN_EXP = (long)(30 * 60 * 1000); // 30분
+	private static final Long ACCESS_TOKEN_EXP = (long)(60 * 60 * 1000); // 60분
 	private static final Long REFRESH_TOKEN_EXP = (long)(7 * 24 * 60 * 60 * 1000); // 7일
 	private static final String REFRESH_TOKEN = "RefreshToken";
 	private SecretKey secretKey;
@@ -109,7 +109,10 @@ public class JwtUtil {
 
 	public Optional<String> extractAccessTokenFromRequest(final HttpServletRequest request) {
 		return Optional.ofNullable(request.getHeader(ACCESS_HEADER))
-			.filter(accessToken -> accessToken.startsWith(TOKEN_PREFIX))
+			.filter(accessToken -> {
+				log.info("accessToken: " + accessToken);
+				return accessToken.startsWith(TOKEN_PREFIX);
+			})
 			.map(accessToken -> accessToken.substring(TOKEN_PREFIX.length()));
 	}
 
@@ -125,7 +128,9 @@ public class JwtUtil {
 	private Claims parseToken(final String token) {
 		return Jwts.parser()
 			.verifyWith(secretKey)
-			.build().parseSignedClaims(token).getPayload();
+			.build()
+			.parseSignedClaims(token.trim())
+			.getPayload();
 	}
 
 	private boolean isTokenExpired(final Claims claims) {
