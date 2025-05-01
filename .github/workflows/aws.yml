@@ -124,7 +124,8 @@ jobs:
              {"name": "KIS_ACNT_PRDT_CD", "value": $KIS_ACNT_PRDT_CD},
              {"name": "KIS_APP_KEY", "value": $KIS_APP_KEY},
              {"name": "KIS_APP_SECRET", "value": $KIS_APP_SECRET},
-             {"name": "KIS_CANO", "value": $KIS_CANO}
+             {"name": "KIS_CANO", "value": $KIS_CANO},
+             {"name": "ACTIVE_PROFILE", "value": $ACTIVE_PROFILE}
            ]' "$ECS_TASK_DEFINITION" > ecs-task-definition-updated.json
 
     - name: Fill in image for stockassist container
