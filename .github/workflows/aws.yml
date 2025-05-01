@@ -111,6 +111,7 @@ jobs:
            --arg KIS_APP_KEY "$KIS_APP_KEY" \
            --arg KIS_APP_SECRET "$KIS_APP_SECRET" \
            --arg KIS_CANO "$KIS_CANO" \
+           --arg ACTIVE_PROFILE "$ACTIVE_PROFILE" \
            '(.containerDefinitions[] | select(.name == "stockassist") | .environment) += [
              {"name": "DB_URL", "value": $DB_URL},
              {"name": "DB_USER", "value": $DB_USER},
