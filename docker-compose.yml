@@ -1,8 +1,8 @@
-version: "3.8"
-
 services:
   redis:
-    image: redis:7.4.2-alpine
+    build:
+        context: ./redis
+    image: ${ECR_REGISTRY}/${ECR_REPOSITORY_REDIS}:${IMAGE_TAG}
     container_name: redis-server
     restart: always
     ports:
@@ -10,18 +10,15 @@ services:
     volumes:
       - redis_dev_data:/data
     command: [ "redis-server", "--appendonly", "yes", "--appendfsync", "everysec" ]
-    healthcheck:
-      test: [ "CMD", "redis-cli", "ping" ]
-      interval: 5s
-      timeout: 3s
-      retries: 5
 
   stockassist:
-    image: 46112/tuzain:latest
+    build:
+      context: ./
+    image: ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
     container_name: stockassist-server
     restart: always
     ports:
-      - 4003:4003   # TODO: 추후 포트 번호 바꿔서 배포 예정
+      - 4003:4003
     environment:
       - DB_URL=${DB_URL}
       - DB_USER=${DB_USER}
@@ -38,9 +35,7 @@ services:
       - KIS_ACNT_PRDT_CD=${KIS_ACNT_PRDT_CD}
       - SPRING_DATA_REDIS_HOST=redis
       - SPRING_PROFILES_ACTIVE=prod
-    depends_on:
-      redis:
-        condition: service_healthy
+
 
 volumes:
   redis_dev_data:
