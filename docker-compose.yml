@@ -1,0 +1,42 @@
+services:
+  redis:
+    build:
+        context: ./redis
+    image: ${ECR_REGISTRY}/${ECR_REPOSITORY_REDIS}:${IMAGE_TAG}
+    container_name: redis-server
+    restart: always
+    ports:
+      - 6379:6379
+    volumes:
+      - redis_dev_data:/data
+    command: [ "redis-server", "--appendonly", "yes", "--appendfsync", "everysec" ]
+
+  stockassist:
+    build:
+      context: ./
+    image: ${ECR_REGISTRY}/${ECR_REPOSITORY}:${IMAGE_TAG}
+    container_name: stockassist-server
+    restart: always
+    ports:
+      - 4003:4003
+    environment:
+      - DB_URL=${DB_URL}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - CRAWLING_DB_URL=${CRAWLING_DB_URL}
+      - CRAWLING_DB_USER=${CRAWLING_DB_USER}
+      - CRAWLING_DB_PASSWORD=${CRAWLING_DB_PASSWORD}
+      - GMAIL_USERNAME=${GMAIL_USERNAME}
+      - GMAIL_APP_PASSWORD=${GMAIL_APP_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - KIS_APP_KEY=${KIS_APP_KEY}
+      - KIS_APP_SECRET=${KIS_APP_SECRET}
+      - KIS_CANO=${KIS_CANO}
+      - KIS_ACNT_PRDT_CD=${KIS_ACNT_PRDT_CD}
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_PROFILES_ACTIVE=prod
+
+
+volumes:
+  redis_dev_data:
+    external: true

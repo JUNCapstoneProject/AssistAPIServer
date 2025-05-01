@@ -26,7 +26,7 @@ spring:
         ddl-auto: none
   data:
     redis:
-      host: localhost
+      host: redis
       port: 6379
       timeout: 60000
   mail:
@@ -52,4 +52,4 @@ kis:
   app-key: ${KIS_APP_KEY}
   app-secret: ${KIS_APP_SECRET}
   cano: ${KIS_CANO}
-  acnt-prdt-no: ${KIS_ACNT_PRDT_NO}
+  acnt-prdt-cd: ${KIS_ACNT_PRDT_CD}

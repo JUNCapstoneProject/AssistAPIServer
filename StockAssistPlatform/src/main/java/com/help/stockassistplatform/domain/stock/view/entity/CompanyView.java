@@ -1,4 +1,4 @@
-package com.help.stockassistplatform.domain.stock.entity;
+package com.help.stockassistplatform.domain.stock.view.entity;
 
 import org.hibernate.annotations.Immutable;
 
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Immutable
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class StockView {
+public class CompanyView {
 	@Id
 	@Column(name = "company_id")
 	private Integer companyId;

@@ -1,5 +1,5 @@
 spring:
   profiles:
-    active: dev
+    active: ${ACTIVE_PROFILE}
   application:
     name: StockAssistPlatform
