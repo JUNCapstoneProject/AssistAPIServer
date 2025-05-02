@@ -77,7 +77,7 @@ public class UserService {
 	public void deleteUser(final CustomUser user) {
 		final User loginUser = userRepository.findByUsername(user.getUsername())
 			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-		userReportRepository.deleteByUser(loginUser);
+		userReportRepository.bulkDeleteByUser(loginUser);
 		userRepository.delete(loginUser);
 		log.info("User deleted: {}", loginUser);
 	}
