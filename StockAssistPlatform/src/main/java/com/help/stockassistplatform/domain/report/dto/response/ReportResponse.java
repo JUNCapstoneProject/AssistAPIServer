@@ -19,6 +19,7 @@ public record ReportResponse(
 	String date,
 	String link
 ) {
+	private static final int SUMMARY_LENGTH = 100;
 
 	public static ReportResponse from(final ExpertReport report) {
 		return new ReportResponse(
@@ -49,11 +50,11 @@ public record ReportResponse(
 			return "";
 		}
 
-		if (content.length() <= 100) {
+		if (SUMMARY_LENGTH >= content.length()) {
 			return content;
 		}
 
-		return content.substring(0, 100) + "...";
+		return content.substring(0, SUMMARY_LENGTH) + "...";
 	}
 
 	private static String formatDate(final LocalDateTime dateTime) {

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.help.stockassistplatform.domain.report.dto.request.UserReportRequest;
 import com.help.stockassistplatform.domain.report.dto.response.ReportResponse;
 import com.help.stockassistplatform.domain.report.dto.response.UserReportDetailResponse;
+import com.help.stockassistplatform.domain.report.exception.ReportNotFoundException;
 import com.help.stockassistplatform.domain.report.user.entity.UserReport;
 import com.help.stockassistplatform.domain.report.user.repository.UserReportRepository;
 import com.help.stockassistplatform.domain.user.entity.User;
@@ -31,6 +32,10 @@ public class UserReportService {
 		final Slice<UserReport> slice = (null == category || category.isBlank())
 			? userReportRepository.findAllBy(pageable)
 			: userReportRepository.findAllByCategoryContaining(category, pageable);
+
+		if (slice.isEmpty()) {
+			throw new ReportNotFoundException("리포트가 존재하지 않습니다.");
+		}
 
 		return slice.map(ReportResponse::from);
 	}

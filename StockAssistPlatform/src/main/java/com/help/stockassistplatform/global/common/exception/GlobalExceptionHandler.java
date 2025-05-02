@@ -22,6 +22,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.help.stockassistplatform.domain.news.exception.NewsNotFoundException;
+import com.help.stockassistplatform.domain.report.exception.ReportNotFoundException;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
 
 import jakarta.validation.ConstraintViolationException;
@@ -141,6 +142,14 @@ public class GlobalExceptionHandler {
 			.body(ApiResponse.error(ErrorCode.NOT_FOUND));
 	}
 
+	@ExceptionHandler(ReportNotFoundException.class)
+	public ResponseEntity<ApiResponse<?>> handleReportNotFoundException(final ReportNotFoundException ex) {
+		log.error("ReportNotFoundException : {}", ex.getMessage());
+		return ResponseEntity
+			.status(ErrorCode.NOT_FOUND.getStatus())
+			.body(ApiResponse.error(ErrorCode.NOT_FOUND));
+	}
+	
 	@ExceptionHandler(CustomException.class)
 	public ResponseEntity<ApiResponse<?>> handleCustomException(final CustomException ex) {
 		log.error("CustomException : {}", ex.getMessage());
