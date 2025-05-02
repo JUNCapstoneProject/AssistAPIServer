@@ -7,8 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.help.stockassistplatform.domain.news.dto.NewsResponseDto;
 import com.help.stockassistplatform.domain.news.entity.NewsView;
+import com.help.stockassistplatform.domain.news.exception.NewsNotFoundException;
 import com.help.stockassistplatform.domain.news.repository.NewsRepository;
-import com.help.stockassistplatform.domain.report.exception.NewsNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 

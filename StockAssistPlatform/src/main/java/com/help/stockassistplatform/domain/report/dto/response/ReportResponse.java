@@ -45,7 +45,15 @@ public record ReportResponse(
 	}
 
 	private static String summarize(final String content) {
-		return null != content ? content.substring(0, Math.min(100, content.length())) + "..." : "";
+		if (null == content || content.isBlank()) {
+			return "";
+		}
+
+		if (content.length() <= 100) {
+			return content;
+		}
+
+		return content.substring(0, 100) + "...";
 	}
 
 	private static String formatDate(final LocalDateTime dateTime) {
