@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import com.help.stockassistplatform.domain.report.exception.NewsNotFoundException;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
 
 import jakarta.validation.ConstraintViolationException;
@@ -130,6 +131,14 @@ public class GlobalExceptionHandler {
 		return ResponseEntity
 			.status(HttpStatus.BAD_REQUEST)
 			.body(ApiResponse.error(message, HttpStatus.BAD_REQUEST));
+	}
+
+	@ExceptionHandler(NewsNotFoundException.class)
+	public ResponseEntity<ApiResponse<?>> handleNewsNotFoundException(final NewsNotFoundException ex) {
+		log.error("NewsNotFoundException : {}", ex.getMessage());
+		return ResponseEntity
+			.status(ErrorCode.NOT_FOUND.getStatus())
+			.body(ApiResponse.error(ErrorCode.NOT_FOUND));
 	}
 
 	@ExceptionHandler(CustomException.class)

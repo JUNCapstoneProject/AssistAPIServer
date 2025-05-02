@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.help.stockassistplatform.domain.news.dto.NewsResponseDto;
 import com.help.stockassistplatform.domain.news.entity.NewsView;
 import com.help.stockassistplatform.domain.news.repository.NewsRepository;
+import com.help.stockassistplatform.domain.report.exception.NewsNotFoundException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +27,9 @@ public class NewsService {
 		} else {
 			slice = newsRepository.findByTag(tag, pageable);
 		}
+
+		if (slice.isEmpty())
+			throw new NewsNotFoundException("뉴스 결과가 존재하지 않습니다.");
 
 		return slice.map(NewsResponseDto::from);
 	}
