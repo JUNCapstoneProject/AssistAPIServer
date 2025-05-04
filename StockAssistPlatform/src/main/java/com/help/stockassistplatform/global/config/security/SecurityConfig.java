@@ -66,12 +66,13 @@ public class SecurityConfig {
 	public CorsConfigurationSource configurationSource() {
 		final CorsConfiguration configuration = new CorsConfiguration();
 
-		// 허용할 Origin 지정 TODO: 프론트엔드 출처로 변경
-		configuration.setAllowedOrigins(List.of(
-			"*"
-		));
-
-		configuration.setAllowedMethods(List.of("*"));
+		// 프론트엔드 서버 주소
+		// configuration.setAllowedOrigins(List.of(
+		// 	"http://192.168.25.93:5173"
+		// ));
+		configuration.setAllowedOriginPatterns(List.of("*"));
+		
+		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
 		configuration.setExposedHeaders(List.of("Authorization"));
 		configuration.setAllowCredentials(true);

@@ -18,10 +18,14 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import com.help.stockassistplatform.domain.news.exception.NewsNotFoundException;
+import com.help.stockassistplatform.domain.report.exception.ReportNotFoundException;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -93,6 +97,32 @@ public class GlobalExceptionHandler {
 			.body(ApiResponse.error(errorMessage, HttpStatus.BAD_REQUEST));
 	}
 
+	@ExceptionHandler(ConstraintViolationException.class)
+	public ResponseEntity<ApiResponse<?>> handleConstraintViolationException(final ConstraintViolationException ex) {
+		log.error("ConstraintViolationException : {}", ex.getMessage());
+		final String errorMessage = ex.getConstraintViolations().stream()
+			.findFirst()
+			.map(violation -> violation.getPropertyPath() + " " + violation.getMessage())
+			.orElse("Validation error");
+
+		return ResponseEntity
+			.status(HttpStatus.BAD_REQUEST)
+			.body(ApiResponse.error(errorMessage, HttpStatus.BAD_REQUEST));
+	}
+
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<ApiResponse<?>> handleMethodArgumentTypeMismatchException(
+		final MethodArgumentTypeMismatchException ex
+	) {
+		log.error("MethodArgumentTypeMismatchException : {}", ex.getMessage());
+		final String name = ex.getName();
+		final String message = String.format("%s의 형식이 잘못되었습니다", name);
+
+		return ResponseEntity
+			.status(HttpStatus.BAD_REQUEST)
+			.body(ApiResponse.error(message, HttpStatus.BAD_REQUEST));
+	}
+
 	@ExceptionHandler(MissingServletRequestParameterException.class)
 	public ResponseEntity<ApiResponse<?>> handleMissingParams(final MissingServletRequestParameterException ex) {
 		log.error("MissingServletRequestParameterException : {}", ex.getMessage());
@@ -104,6 +134,22 @@ public class GlobalExceptionHandler {
 			.body(ApiResponse.error(message, HttpStatus.BAD_REQUEST));
 	}
 
+	@ExceptionHandler(NewsNotFoundException.class)
+	public ResponseEntity<ApiResponse<?>> handleNewsNotFoundException(final NewsNotFoundException ex) {
+		log.error("NewsNotFoundException : {}", ex.getMessage());
+		return ResponseEntity
+			.status(ErrorCode.NOT_FOUND.getStatus())
+			.body(ApiResponse.error(ErrorCode.NOT_FOUND));
+	}
+
+	@ExceptionHandler(ReportNotFoundException.class)
+	public ResponseEntity<ApiResponse<?>> handleReportNotFoundException(final ReportNotFoundException ex) {
+		log.error("ReportNotFoundException : {}", ex.getMessage());
+		return ResponseEntity
+			.status(ErrorCode.NOT_FOUND.getStatus())
+			.body(ApiResponse.error(ErrorCode.NOT_FOUND));
+	}
+	
 	@ExceptionHandler(CustomException.class)
 	public ResponseEntity<ApiResponse<?>> handleCustomException(final CustomException ex) {
 		log.error("CustomException : {}", ex.getMessage());

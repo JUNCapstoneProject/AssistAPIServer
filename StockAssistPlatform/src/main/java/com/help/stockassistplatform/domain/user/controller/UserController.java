@@ -2,6 +2,7 @@ package com.help.stockassistplatform.domain.user.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 public class UserController {
 	private final UserService userService;
@@ -56,6 +57,16 @@ public class UserController {
 		@Valid @RequestBody final PasswordChangeRequestDto requestDto
 	) {
 		userService.updateUserPassword(userDetail, requestDto);
+		return ApiResponse.success(null);
+	}
+
+	// 회원 탈퇴
+	@PreAuthorize("isAuthenticated()")
+	@DeleteMapping("/me")
+	public ApiResponse<?> deleteUser(
+		@AuthenticationPrincipal final CustomUser userDetail
+	) {
+		userService.deleteUser(userDetail);
 		return ApiResponse.success(null);
 	}
 }

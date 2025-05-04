@@ -20,14 +20,14 @@ public class ExpertReport {
 
 	@Id
 	@Column(name = "crawling_id")
-	private Long id;
+	private String id;
 
 	private String title;
 
 	@Column(name = "transed_title")
 	private String transedTitle;
 
-	private int hits;
+	private Integer hits;
 	private String author;
 
 	@Column(name = "posted_at")

@@ -4,6 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.help.stockassistplatform.domain.report.user.repository.UserReportRepository;
 import com.help.stockassistplatform.domain.user.dto.request.PasswordChangeRequestDto;
 import com.help.stockassistplatform.domain.user.dto.request.ProfileUpdateRequestDto;
 import com.help.stockassistplatform.domain.user.dto.request.SignupRequestDto;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserService {
 	private final UserRepository userRepository;
+	private final UserReportRepository userReportRepository;
 	private final PasswordEncoder passwordEncoder;
 
 	@Transactional
@@ -69,5 +71,14 @@ public class UserService {
 		if (userRepository.existsByUsername(email)) {
 			throw new CustomException(ErrorCode.EMAIL_ALREADY_EXISTS);
 		}
+	}
+
+	@Transactional
+	public void deleteUser(final CustomUser user) {
+		final User loginUser = userRepository.findByUsername(user.getUsername())
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+		userReportRepository.bulkDeleteByUser(loginUser);
+		userRepository.delete(loginUser);
+		log.info("User deleted: {}", loginUser);
 	}
 }
