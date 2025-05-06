@@ -48,14 +48,14 @@ public class AuthService implements UserDetailsService {
 		response.addHeader("Set-Cookie", jwtUtil.createRefreshTokenCookie(refreshToken).toString());
 		response.addHeader("Authorization", accessToken);
 
-		return ApiResponse.success(null);
+		return ApiResponse.success(accessToken);
 	}
 
 	public ApiResponse<?> refresh(final HttpServletRequest request, final HttpServletResponse response) {
 		final User user = jwtUtil.extractRefreshTokenFromRequest(request)
 			.filter(jwtUtil::isTokenValidate)
 			.flatMap(jwtUtil::extractUsername)
-			.flatMap(userRepository::findByUsername)
+			.flatMap(userRepository::findWithProfileByUsername)
 			.orElseThrow(() -> new CustomException(ErrorCode.INVALID_TOKEN));
 
 		final String accessToken = jwtUtil.createAccessToken(CustomUser.from(user));

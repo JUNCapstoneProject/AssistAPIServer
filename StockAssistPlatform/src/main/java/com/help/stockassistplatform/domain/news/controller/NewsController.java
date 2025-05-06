@@ -6,6 +6,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,8 +17,10 @@ import com.help.stockassistplatform.domain.news.dto.NewsSliceResponse;
 import com.help.stockassistplatform.domain.news.service.NewsService;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
 
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 
+@Validated
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -27,8 +30,8 @@ public class NewsController {
 	@GetMapping("/news")
 	public ApiResponse<?> getNews(
 		@RequestParam(required = false) final String category,
-		@RequestParam(defaultValue = "1") final int page,
-		@RequestParam(defaultValue = "6") final int limit
+		@RequestParam(defaultValue = "1") @Min(1L) final int page,
+		@RequestParam(defaultValue = "6") @Min(1L) final int limit
 	) {
 		final Pageable pageable = PageRequest.of(page - 1, limit, Sort.by(DESC, "postedAt"));
 		final Slice<NewsResponseDto> result = newsService.getNews(category, pageable);

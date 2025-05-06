@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum ErrorCode {
-	INVALID_CREDENTIALS(400, "로그인에 실패했습니다"),
+	INVALID_CREDENTIALS(400, "아이디나 패스워드가 일치하지 않습니다."),
 	INVALID_PASSWORD(400, "잘못된 비밀번호입니다"),
 
 	EXPIRED_TOKEN(401, "인증 토큰이 만료되었습니다"),
