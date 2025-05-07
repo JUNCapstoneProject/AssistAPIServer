@@ -15,9 +15,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/auth")
+@Slf4j
 @RequiredArgsConstructor
 public class AuthController {
 	private final AuthService authService;
@@ -37,6 +39,7 @@ public class AuthController {
 		final HttpServletRequest request,
 		final HttpServletResponse response
 	) {
+		log.info("[POST] /api/auth/refresh");
 		return authService.refresh(request, response);
 	}
 
