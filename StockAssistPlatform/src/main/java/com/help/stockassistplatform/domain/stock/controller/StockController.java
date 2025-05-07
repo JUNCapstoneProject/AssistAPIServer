@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.help.stockassistplatform.domain.stock.dto.StockAnalysisResponse;
+import com.help.stockassistplatform.domain.stock.dto.StockAnalysisType;
 import com.help.stockassistplatform.domain.stock.dto.StockSearchResponse;
 import com.help.stockassistplatform.domain.stock.service.StockService;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
@@ -33,8 +34,13 @@ public class StockController {
 	}
 
 	@GetMapping("/analysis")
-	public ApiResponse<?> getStockAnalysis() {
-		final List<StockAnalysisResponse> results = stockService.getStockAnalysis();
+	public ApiResponse<?> getStockAnalysis(
+		@RequestParam(value = "type", defaultValue = "financial") final String typeStr) {
+		final StockAnalysisType type = StockAnalysisType.from(typeStr);
+		final List<StockAnalysisResponse> results = switch (type) {
+			case FINANCIAL -> stockService.getStockAnalysis();
+			case NEWS -> stockService.getStockAnalysis();
+		};
 		return ApiResponse.success(results);
 	}
 }
