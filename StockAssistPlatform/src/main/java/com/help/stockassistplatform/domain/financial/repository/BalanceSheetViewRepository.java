@@ -19,17 +19,4 @@ public interface BalanceSheetViewRepository extends JpaRepository<BalanceSheetVi
 		    ORDER BY v.company, v.postedAt DESC
 		""")
 	List<BalanceSheetView> findRecent2ByTickers(@Param("tickers") List<String> tickers);
-
-	@Query(value = """
-			SELECT company
-			FROM (
-			    SELECT company, total_assets,
-			           ROW_NUMBER() OVER (PARTITION BY company ORDER BY posted_at DESC) AS rn
-			    FROM balance_sheet_vw
-			) AS latest
-			WHERE rn = 1
-			ORDER BY total_assets DESC
-			LIMIT 8;
-		""", nativeQuery = true)
-	List<String> findTop8CompaniesByLatestTotalAssets();
 }
