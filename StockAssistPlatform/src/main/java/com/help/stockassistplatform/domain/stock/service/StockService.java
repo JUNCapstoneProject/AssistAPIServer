@@ -1,6 +1,5 @@
 package com.help.stockassistplatform.domain.stock.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -39,9 +38,6 @@ public class StockService {
 	}
 
 	public List<StockAnalysisResponse> getStockAnalysis() {
-		final List<StockAnalysisResponse> analysisResponses = aiAnalysisOrchestrator.stockAnalysisResponses();
-		List<StockAnalysisResponse> a = new ArrayList<>();
-		a.add(new StockAnalysisResponse("AAPL", "Apple Inc.", "Strong Buy"));
-		return a;
+		return aiAnalysisOrchestrator.stockAnalysisResponses();
 	}
 }
