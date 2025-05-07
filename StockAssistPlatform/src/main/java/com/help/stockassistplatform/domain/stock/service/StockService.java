@@ -1,19 +1,26 @@
 package com.help.stockassistplatform.domain.stock.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.help.stockassistplatform.domain.stock.dto.StockAnalysisResponse;
 import com.help.stockassistplatform.domain.stock.dto.StockSearchResponse;
 import com.help.stockassistplatform.domain.stock.indexed.entity.CompanyIndexed;
 import com.help.stockassistplatform.domain.stock.indexed.repository.CompanyIndexedRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class StockService {
 	private final CompanyIndexedRepository companyViewRepository;
+	private final AiAnalysisOrchestrator aiAnalysisOrchestrator;
 
 	public List<StockSearchResponse> search(final String query) {
 		final List<CompanyIndexed> result;
@@ -29,5 +36,12 @@ public class StockService {
 			.stream()
 			.map(StockSearchResponse::from)
 			.toList();
+	}
+
+	public List<StockAnalysisResponse> getStockAnalysis() {
+		final List<StockAnalysisResponse> analysisResponses = aiAnalysisOrchestrator.stockAnalysisResponses();
+		List<StockAnalysisResponse> a = new ArrayList<>();
+		a.add(new StockAnalysisResponse("AAPL", "Apple Inc.", "Strong Buy"));
+		return a;
 	}
 }

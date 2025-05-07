@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.help.stockassistplatform.domain.stock.dto.StockAnalysisResponse;
 import com.help.stockassistplatform.domain.stock.dto.StockSearchResponse;
 import com.help.stockassistplatform.domain.stock.service.StockService;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
@@ -29,5 +30,11 @@ public class StockController {
 		}
 		final List<StockSearchResponse> results = stockService.search(query);
 		return ApiResponse.success(Map.of("searchData", results));
+	}
+
+	@GetMapping("/analysis")
+	public ApiResponse<?> getStockAnalysis() {
+		final List<StockAnalysisResponse> results = stockService.getStockAnalysis();
+		return ApiResponse.success(results);
 	}
 }
