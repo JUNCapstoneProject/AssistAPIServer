@@ -1,5 +1,7 @@
 package com.help.stockassistplatform.domain.report.controller;
 
+import java.util.UUID;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -73,7 +75,7 @@ public class ReportController {
 
 	@GetMapping("/{id}")
 	public ApiResponse<?> getUserReport(
-		@PathVariable final Long id,
+		@PathVariable final UUID id,
 		@AuthenticationPrincipal final CustomUser userDetail
 	) {
 		final UserReportDetailResponse response = userReportService.getReportDetail(id, userDetail);
@@ -83,7 +85,7 @@ public class ReportController {
 	@PutMapping("/{id}")
 	@PreAuthorize("isAuthenticated()")
 	public ApiResponse<?> updateUserReport(
-		@PathVariable final Long id,
+		@PathVariable final UUID id,
 		@RequestBody @Valid final UserReportRequest request,
 		@AuthenticationPrincipal final CustomUser userDetail
 	) {
@@ -94,7 +96,7 @@ public class ReportController {
 	@DeleteMapping("/{id}")
 	@PreAuthorize("isAuthenticated()")
 	public ApiResponse<?> deleteUserReport(
-		@PathVariable final Long id,
+		@PathVariable final UUID id,
 		@AuthenticationPrincipal final CustomUser userDetail
 	) {
 		userReportService.deleteReport(id, userDetail);

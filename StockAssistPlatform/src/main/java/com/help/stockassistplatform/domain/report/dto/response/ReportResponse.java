@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.help.stockassistplatform.domain.report.expert.entity.ExpertReport;
@@ -11,7 +12,7 @@ import com.help.stockassistplatform.domain.report.user.entity.UserReport;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ReportResponse(
-	Long id,
+	UUID id,
 	String category,
 	String source,
 	String title,

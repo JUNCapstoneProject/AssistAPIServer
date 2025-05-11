@@ -1,5 +1,9 @@
 package com.help.stockassistplatform.domain.report.user.entity;
 
+import java.util.UUID;
+
+import org.hibernate.annotations.GenericGenerator;
+
 import com.help.stockassistplatform.domain.user.entity.User;
 import com.help.stockassistplatform.global.common.BaseTimeEntity;
 
@@ -7,7 +11,6 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
@@ -23,8 +26,10 @@ import lombok.NoArgsConstructor;
 public class UserReport extends BaseTimeEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	@GeneratedValue(generator = "uuid2")
+	@GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+	@Column(name = "report_id", columnDefinition = "BINARY(16)")
+	private UUID id;
 
 	private String category;
 	private String title;
@@ -37,7 +42,7 @@ public class UserReport extends BaseTimeEntity {
 	@JoinColumn(name = "user_id")
 	private User user;
 
-	@Column(nullable = false)
+	@Column(nullable = false, name = "user_nickname")
 	private String writerNickname;
 
 	@Builder
