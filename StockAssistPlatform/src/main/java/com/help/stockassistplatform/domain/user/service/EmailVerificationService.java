@@ -20,7 +20,7 @@ public class EmailVerificationService {
 
 	public void sendVerificationEmail(final String token, final String email) {
 		// TODO: 인증 링크 프론트엔드 주소로 변경
-		final String verificationLink = "http://localhost:8080/api/auth/verify?token=" + token;
+		final String verificationLink = "http://localhost:5173/verify?token=" + token;
 		try {
 			final MimeMessage message = mailSender.createMimeMessage();
 			final MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
