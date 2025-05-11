@@ -1,5 +1,8 @@
 package com.help.stockassistplatform.domain.report.user.repository;
 
+import java.util.Optional;
+import java.util.UUID;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,4 +26,6 @@ public interface UserReportRepository extends JpaRepository<UserReport, Long> {
 	@Modifying(clearAutomatically = true)
 	@Query("DELETE FROM UserReport ur WHERE ur.user = :user")
 	void bulkDeleteByUser(@Param("user") User user);
+
+	Optional<UserReport> findById(UUID id);
 }

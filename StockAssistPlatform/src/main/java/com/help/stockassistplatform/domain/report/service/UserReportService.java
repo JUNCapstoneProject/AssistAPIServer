@@ -1,5 +1,7 @@
 package com.help.stockassistplatform.domain.report.service;
 
+import java.util.UUID;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -55,7 +57,7 @@ public class UserReportService {
 		userReportRepository.save(report);
 	}
 
-	public UserReportDetailResponse getReportDetail(final Long reportId, final CustomUser userDetail) {
+	public UserReportDetailResponse getReportDetail(final UUID reportId, final CustomUser userDetail) {
 		final UserReport report = getReportOrThrow(reportId);
 		final boolean isAuthor = isAuthor(report, userDetail);
 
@@ -64,7 +66,7 @@ public class UserReportService {
 
 	@Transactional
 	public void updateReport(
-		final Long reportId,
+		final UUID reportId,
 		final UserReportRequest request,
 		final CustomUser userDetail
 	) {
@@ -81,7 +83,7 @@ public class UserReportService {
 	}
 
 	@Transactional
-	public void deleteReport(final Long reportId, final CustomUser userDetail) {
+	public void deleteReport(final UUID reportId, final CustomUser userDetail) {
 		final UserReport report = getReportOrThrow(reportId);
 
 		validateAuthor(report, userDetail);
@@ -90,7 +92,7 @@ public class UserReportService {
 		userReportRepository.delete(report);
 	}
 
-	private UserReport getReportOrThrow(final Long id) {
+	private UserReport getReportOrThrow(final UUID id) {
 		return userReportRepository.findById(id)
 			.orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
 	}
@@ -102,7 +104,7 @@ public class UserReportService {
 	}
 
 	private boolean isAuthor(final UserReport report, final CustomUser userDetail) {
-		final Long currentUserId = (null != userDetail) ? userDetail.getUserId() : null;
+		final UUID currentUserId = (null != userDetail) ? userDetail.getUserId() : null;
 		return report.getUser().getUserId().equals(currentUserId);
 	}
 }

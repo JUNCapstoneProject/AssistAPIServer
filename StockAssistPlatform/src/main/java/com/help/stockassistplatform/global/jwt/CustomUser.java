@@ -3,6 +3,7 @@ package com.help.stockassistplatform.global.jwt;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,7 +15,7 @@ import lombok.Setter;
 public class CustomUser extends User {
 	@Getter
 	@Setter
-	private Long userId;
+	private UUID userId;
 	@Getter
 	@Setter
 	private String nickname;
