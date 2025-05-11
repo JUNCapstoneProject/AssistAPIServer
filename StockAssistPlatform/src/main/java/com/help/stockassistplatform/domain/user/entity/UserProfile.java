@@ -1,5 +1,7 @@
 package com.help.stockassistplatform.domain.user.entity;
 
+import java.util.UUID;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -21,14 +23,15 @@ import lombok.ToString;
 @Entity
 public class UserProfile {
 	@Id
-	private Long userId;
+	@Column(name = "user_id", columnDefinition = "BINARY(16)")
+	private UUID userId;
 
 	@MapsId
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
-	@Column(nullable = false, unique = true)
+	@Column(nullable = false, unique = true, name = "user_email")
 	private String email;
 
 	@Column(nullable = false, length = 10)

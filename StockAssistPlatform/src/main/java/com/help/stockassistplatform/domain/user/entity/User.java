@@ -1,5 +1,9 @@
 package com.help.stockassistplatform.domain.user.entity;
 
+import java.util.UUID;
+
+import org.hibernate.annotations.GenericGenerator;
+
 import com.help.stockassistplatform.global.common.BaseTimeEntity;
 
 import jakarta.persistence.CascadeType;
@@ -9,7 +13,6 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -26,17 +29,19 @@ import lombok.ToString;
 @Entity
 public class User extends BaseTimeEntity {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long userId;
+	@GeneratedValue(generator = "uuid2")
+	@GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+	@Column(name = "user_id", columnDefinition = "BINARY(16)")
+	private UUID userId;
 
 	@Column(nullable = false, unique = true)
 	private String username;
 
-	@Column(nullable = false)
+	@Column(nullable = false, name = "user_pw")
 	private String password;
 
 	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
+	@Column(nullable = false, name = "user_role")
 	private UserRole role = UserRole.USER;
 
 	@OneToOne(
@@ -47,11 +52,11 @@ public class User extends BaseTimeEntity {
 	)
 	private UserProfile userProfile;
 
-	public static User ofId(final Long userId) {
+	public static User ofId(final UUID userId) {
 		return new User(userId);
 	}
 
-	private User(final Long userId) {
+	private User(final UUID userId) {
 		this.userId = userId;
 	}
 
