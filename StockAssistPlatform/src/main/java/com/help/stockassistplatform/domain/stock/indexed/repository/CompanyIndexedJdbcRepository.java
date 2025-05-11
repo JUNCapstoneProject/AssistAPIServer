@@ -20,7 +20,7 @@ public class CompanyIndexedJdbcRepository {
 
 	public void batchInsert(final List<CompanyIndexed> companies) {
 		final String sql = """
-				INSERT INTO company_indexed (company_id, ticker, name_kr, name_en)
+				INSERT INTO Company (company_id, ticker, name_kr, name_en)
 				VALUES (?, ?, ?, ?)
 			""";
 
