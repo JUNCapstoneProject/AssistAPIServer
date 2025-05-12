@@ -36,4 +36,28 @@ public class EmailVerificationService {
 		}
 	}
 
+	public void sendPasswordResetEmail(final String token, final String email) {
+		// TODO: 프론트엔드 비밀번호 재설정 주소로 변경
+		final String resetLink = "http://localhost:8080/reset-password?token=" + token;
+
+		try {
+			final MimeMessage message = mailSender.createMimeMessage();
+			final MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+			helper.setTo(email);
+			helper.setSubject("🔒 투자인 비밀번호 재설정 안내");
+			helper.setText(
+				"""
+					<p>안녕하세요.</p>
+					<p>비밀번호 재설정을 원하신다면 아래 버튼을 클릭해주세요.</p>
+					<a href='%s'>비밀번호 재설정</a>
+					""".formatted(resetLink), true
+			);
+
+			mailSender.send(message);
+		} catch (final MessagingException e) {
+			log.error("비밀번호 재설정 이메일 전송 실패: ", e);
+			throw new RuntimeException("이메일 전송 실패", e);
+		}
+	}
 }
