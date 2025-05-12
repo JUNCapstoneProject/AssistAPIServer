@@ -61,7 +61,7 @@ public class AuthService implements UserDetailsService {
 		final String accessToken = jwtUtil.createAccessToken(CustomUser.from(user));
 		response.addHeader("Authorization", accessToken);
 		log.info("AccessToken 재발급: {}", accessToken);
-		return ApiResponse.success(null);
+		return ApiResponse.success(accessToken);
 	}
 
 	// logout
