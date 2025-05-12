@@ -27,7 +27,9 @@ public class EmailVerificationFilter extends OncePerRequestFilter {
 	private static final List<String> TRUSTED_EMAIL_SERVERS = List.of(
 		"https://mail.google.com",
 		"https://mail.naver.com",
-		"https://outlook.live.com"
+		"https://outlook.live.com",
+		"http://localhost:5173",
+		"http://www.tuzain.com/"
 	);
 
 	private final ObjectMapper objectMapper;
