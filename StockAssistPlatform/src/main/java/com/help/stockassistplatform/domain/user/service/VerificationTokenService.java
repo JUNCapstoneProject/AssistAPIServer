@@ -21,6 +21,8 @@ import lombok.extern.slf4j.Slf4j;
 public class VerificationTokenService {
 	private static final long EXPIRE_MINUTES = 10L;
 	private static final String TOKEN_PREFIX = "auth:email:";
+	private static final String PASSWORD_RESET_PREFIX = "auth:pwd:";
+
 	private final RedisTemplate<String, Object> redisTemplate;
 	private final ObjectMapper objectMapper;
 
@@ -51,5 +53,17 @@ public class VerificationTokenService {
 			log.error("Deserialization Error: ", e);
 			throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}
+	}
+
+	public void saveResetEmailToRedis(final String token, final String email) {
+		redisTemplate.opsForValue().set(PASSWORD_RESET_PREFIX + token, email, Duration.ofMinutes(EXPIRE_MINUTES));
+	}
+
+	public String getResetEmailFromRedis(final String token) {
+		final String email = (String)redisTemplate.opsForValue().get(PASSWORD_RESET_PREFIX + token);
+		if (email == null) {
+			throw new CustomException(ErrorCode.EXPIRED_TOKEN);
+		}
+		return email;
 	}
 }
