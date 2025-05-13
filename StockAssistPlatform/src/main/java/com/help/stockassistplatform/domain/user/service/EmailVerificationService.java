@@ -38,7 +38,7 @@ public class EmailVerificationService {
 
 	public void sendPasswordResetEmail(final String token, final String email) {
 		// TODO: 프론트엔드 비밀번호 재설정 주소로 변경
-		final String resetLink = "http://localhost:8080/reset-password?token=" + token;
+		final String resetLink = "http://localhost:5173/reset-password?token=" + token;
 
 		try {
 			final MimeMessage message = mailSender.createMimeMessage();
