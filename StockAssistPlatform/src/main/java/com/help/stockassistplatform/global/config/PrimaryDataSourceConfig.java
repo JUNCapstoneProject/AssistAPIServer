@@ -54,6 +54,15 @@ public class PrimaryDataSourceConfig {
 		config.setPassword(dbPassword);
 		config.setDriverClassName("com.mysql.cj.jdbc.Driver");
 		config.setTransactionIsolation("TRANSACTION_READ_COMMITTED");
+
+		config.setMaximumPoolSize(10);                 // 기본: 10
+		config.setMinimumIdle(3);                      // 기본: same as max
+		config.setIdleTimeout(300_000);                // 5분
+		config.setMaxLifetime(600_000);                // 10분 (MySQL 서버 timeout보다 작게)
+		config.setConnectionTimeout(30_000);           // 커넥션 대기 최대 30초
+		config.setValidationTimeout(5_000);            // 커넥션 검증 제한 시간
+		config.setKeepaliveTime(300_000);              // 5분마다 ping
+
 		return new HikariDataSource(config);
 	}
 
