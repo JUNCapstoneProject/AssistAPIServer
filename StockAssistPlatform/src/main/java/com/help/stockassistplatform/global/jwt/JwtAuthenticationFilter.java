@@ -32,7 +32,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private static final List<WhiteListEntry> WHITE_LIST = List.of(
 		new WhiteListEntry("GET", "/"),
 		new WhiteListEntry("GET", "/api/auth/verify"),
-		new WhiteListEntry("POST", "/api/auth/*"),
+		new WhiteListEntry("POST", "/api/auth/login"),
+		new WhiteListEntry("POST", "/api/auth/logout"),
 		new WhiteListEntry("GET", "/api/news"),
 		new WhiteListEntry("GET", "/api/reports")
 	);

@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.help.stockassistplatform.domain.user.dto.request.LoginRequestDto;
+import com.help.stockassistplatform.domain.user.dto.response.LoginResponseDto;
 import com.help.stockassistplatform.domain.user.entity.User;
 import com.help.stockassistplatform.domain.user.repository.UserRepository;
 import com.help.stockassistplatform.global.common.exception.CustomException;
@@ -38,17 +39,26 @@ public class AuthService implements UserDetailsService {
 		return CustomUser.from(user);
 	}
 
-	public ApiResponse<?> login(final LoginRequestDto loginRequestDto, final HttpServletResponse response) {
+	public ApiResponse<?> login(
+		final LoginRequestDto loginRequestDto,
+		final String redirectUrl,
+		final HttpServletResponse response
+	) {
 		final Authentication authentication = authenticationManagerBuilder.getObject()
-			.authenticate(
-				new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword()));
+			.authenticate(new UsernamePasswordAuthenticationToken(
+				loginRequestDto.getEmail(),
+				loginRequestDto.getPassword()
+			));
+
 		final CustomUser user = (CustomUser)authentication.getPrincipal();
 		final String accessToken = jwtUtil.createAccessToken(user);
 		final String refreshToken = jwtUtil.createRefreshToken(user);
+
 		response.addHeader("Set-Cookie", jwtUtil.createRefreshTokenCookie(refreshToken).toString());
 		response.addHeader("Authorization", accessToken);
 
-		return ApiResponse.success(accessToken);
+		final LoginResponseDto responseDto = new LoginResponseDto(accessToken, redirectUrl);
+		return ApiResponse.success(responseDto);
 	}
 
 	public ApiResponse<?> refresh(final HttpServletRequest request, final HttpServletResponse response) {
@@ -61,7 +71,7 @@ public class AuthService implements UserDetailsService {
 		final String accessToken = jwtUtil.createAccessToken(CustomUser.from(user));
 		response.addHeader("Authorization", accessToken);
 		log.info("AccessToken 재발급: {}", accessToken);
-		return ApiResponse.success(null);
+		return ApiResponse.success(accessToken);
 	}
 
 	// logout

@@ -81,4 +81,26 @@ public class UserService {
 		userRepository.delete(loginUser);
 		log.info("User deleted: {}", loginUser);
 	}
+
+	@Transactional
+	public void changeUserPassword(
+		final CustomUser user,
+		final String newPassword
+	) {
+		final User loginUser = userRepository.findByUsername(user.getUsername())
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+		loginUser.updatePassword(passwordEncoder.encode(newPassword));
+		userRepository.save(loginUser);
+		log.info("User password updated: {}", loginUser);
+	}
+
+	public void checkEmailOwnership(
+		final CustomUser user,
+		final String email
+	) {
+		if (!user.getUsername().equals(email)) {
+			throw new CustomException(ErrorCode.UNAUTHORIZED_PASSWORD_CHANGE);
+		}
+	}
 }
