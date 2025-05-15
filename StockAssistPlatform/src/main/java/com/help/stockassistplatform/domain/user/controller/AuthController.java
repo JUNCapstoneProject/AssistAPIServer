@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.help.stockassistplatform.domain.user.dto.request.LoginRequestDto;
@@ -40,9 +41,10 @@ public class AuthController {
 	@PostMapping("/login")
 	public ApiResponse<?> login(
 		@Valid @RequestBody final LoginRequestDto loginRequestDto,
+		@RequestParam(value = "redirectUrl", defaultValue = "/") final String redirectUrl,
 		final HttpServletResponse response
 	) {
-		return authService.login(loginRequestDto, response);
+		return authService.login(loginRequestDto, redirectUrl, response);
 	}
 
 	// AccessToken 갱신 요청
