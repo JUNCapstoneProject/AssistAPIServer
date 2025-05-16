@@ -32,7 +32,7 @@ public class UserController {
 	public ApiResponse<?> lookUpUserProfile(
 		@AuthenticationPrincipal final CustomUser userDetail
 	) {
-		final User loginUser = userService.findUserByUsername(userDetail.getUsername());
+		final User loginUser = userService.findUserWithProfileByUsername(userDetail.getUsername());
 		final ProfileResponseDto profileInfo = ProfileResponseDto.from(loginUser.getUserProfile());
 		return ApiResponse.success(profileInfo);
 	}
@@ -44,7 +44,7 @@ public class UserController {
 		@AuthenticationPrincipal final CustomUser userDetail,
 		@Valid @RequestBody final ProfileUpdateRequestDto requestDto
 	) {
-		final User loginUser = userService.findUserByUsername(userDetail.getUsername());
+		final User loginUser = userService.findUserWithProfileByUsername(userDetail.getUsername());
 		userService.updateUserProfile(loginUser, requestDto);
 		return ApiResponse.success(null);
 	}
