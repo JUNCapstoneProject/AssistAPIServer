@@ -13,6 +13,8 @@ import com.help.stockassistplatform.domain.stock.dto.response.SliceResponse;
 import com.help.stockassistplatform.domain.stock.dto.response.StockSummaryDto;
 import com.help.stockassistplatform.domain.stock.indexed.entity.CompanyIndexed;
 import com.help.stockassistplatform.domain.stock.indexed.repository.CompanyIndexedRepository;
+import com.help.stockassistplatform.global.common.exception.CustomException;
+import com.help.stockassistplatform.global.common.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -70,6 +72,9 @@ public class StockService {
 		final int indexInGroup = (page - 1) % groupSize;
 		final int fromIndex = indexInGroup * size;
 		final int toIndex = Math.min(fromIndex + size, result.size());
+		if (fromIndex > toIndex) {
+			throw new CustomException(ErrorCode.PAGE_OUT_OF_RANGE);
+		}
 
 		final List<StockSummaryDto> data = result.subList(fromIndex, toIndex)
 			.stream()
