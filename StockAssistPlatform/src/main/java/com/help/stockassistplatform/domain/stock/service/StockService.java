@@ -48,39 +48,31 @@ public class StockService {
 		return aiAnalysisOrchestrator.stockAnalysisResponses();
 	}
 
-	public SliceResponse<StockSummaryDto> getStocksByMarketCap(final int page, final int size) {
+	public SliceResponse<StockSummaryDto> getStocksByMarketCap(final int page, final int pageSize) {
 		final int groupSize = 10;
 
-		// page = 13 → groupIndex = 1 (11~20페이지)
 		final int groupIndex = (page - 1) / groupSize;
+		final int groupOffset = groupIndex * groupSize * pageSize;
+		final int fetchLimit = groupSize * pageSize + 1;
 
-		// 11과 20 사이의 페이지라면 startPage는 11, offset은 (11 - 1) * size = 100
-		final int startPage = groupIndex * groupSize + 1;
-		final int offset = (startPage - 1) * size;
+		final List<StockPriceView> fetched = stockPriceViewRepository.findByMarketCapPaged(fetchLimit, groupOffset);
 
-		// (groupSize * size + 1) 만큼 가져와야 hasNext 판단 가능
-		final int fetchLimit = groupSize * size + 1;
+		final boolean hasNext = fetched.size() > groupSize * pageSize;
+		final int total = Math.min(fetched.size(), groupSize * pageSize);
 
-		List<StockPriceView> result = stockPriceViewRepository.findByMarketCapPaged(fetchLimit, offset);
-
-		final boolean hasNext = result.size() > groupSize * size;
-		if (hasNext) {
-			result = result.subList(0, groupSize * size);
-		}
-
-		// 클라이언트가 요청한 페이지에 해당하는 데이터 추출
 		final int indexInGroup = (page - 1) % groupSize;
-		final int fromIndex = indexInGroup * size;
-		final int toIndex = Math.min(fromIndex + size, result.size());
-		if (fromIndex > toIndex) {
+		final int fromIndex = indexInGroup * pageSize;
+		final int toIndex = Math.min(fromIndex + pageSize, total);
+
+		if (fromIndex >= toIndex) {
 			throw new CustomException(ErrorCode.PAGE_OUT_OF_RANGE);
 		}
 
-		final List<StockSummaryDto> data = result.subList(fromIndex, toIndex)
+		final List<StockSummaryDto> data = fetched.subList(fromIndex, toIndex)
 			.stream()
 			.map(StockSummaryDto::from)
 			.toList();
 
-		return new SliceResponse<>(data, result.size(), hasNext);
+		return new SliceResponse<>(data, total, hasNext);
 	}
 }
