@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.help.stockassistplatform.domain.stock.dto.StockAnalysisResponse;
-import com.help.stockassistplatform.domain.stock.dto.StockAnalysisType;
-import com.help.stockassistplatform.domain.stock.dto.StockSearchResponse;
+import com.help.stockassistplatform.domain.stock.dto.request.StockAnalysisType;
 import com.help.stockassistplatform.domain.stock.dto.response.SliceResponse;
+import com.help.stockassistplatform.domain.stock.dto.response.StockAnalysisResponse;
+import com.help.stockassistplatform.domain.stock.dto.response.StockSearchResponse;
 import com.help.stockassistplatform.domain.stock.dto.response.StockSummaryDto;
 import com.help.stockassistplatform.domain.stock.service.StockService;
 import com.help.stockassistplatform.global.common.response.ApiResponse;

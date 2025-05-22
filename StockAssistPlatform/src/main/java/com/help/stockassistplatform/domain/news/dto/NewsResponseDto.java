@@ -18,15 +18,6 @@ public class NewsResponseDto {
 	private String source;
 	private String date;
 	private String link;
-	/*
-	*   "category": "테슬라",
-        "status": "긍정",
-        "title": "테슬라, 자율주행 기술 업데이트로 주가 상승",
-        "description": "테슬라가 최신 자율주행 소프트웨어 업데이트를 발표하며 주가가 3% 상승했습니다.",
-        "source": "블룸버그",
-        "date": "2024.03.08",
-        "link": "https://example.com/news1"
-	* */
 
 	public static NewsResponseDto from(final NewsView newsView) {
 		final NewsResponseDto dto = new NewsResponseDto();

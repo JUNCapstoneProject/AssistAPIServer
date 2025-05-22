@@ -7,8 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.help.stockassistplatform.domain.financial.repository.FinancialAnalysisViewRepository;
 import com.help.stockassistplatform.domain.financial.repository.StockPriceViewRepository;
-import com.help.stockassistplatform.domain.stock.dto.StockAnalysisResponse;
-import com.help.stockassistplatform.domain.stock.dto.StockTickerNameDto;
+import com.help.stockassistplatform.domain.stock.dto.response.StockAnalysisResponse;
+import com.help.stockassistplatform.domain.stock.dto.response.StockTickerNameDto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

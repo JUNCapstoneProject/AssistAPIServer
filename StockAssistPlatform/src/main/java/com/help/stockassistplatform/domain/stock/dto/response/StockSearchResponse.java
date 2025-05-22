@@ -1,4 +1,4 @@
-package com.help.stockassistplatform.domain.stock.dto;
+package com.help.stockassistplatform.domain.stock.dto.response;
 
 import com.help.stockassistplatform.domain.stock.indexed.entity.CompanyIndexed;
 

@@ -7,9 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.help.stockassistplatform.domain.financial.entity.StockPriceView;
 import com.help.stockassistplatform.domain.financial.repository.StockPriceViewRepository;
-import com.help.stockassistplatform.domain.stock.dto.StockAnalysisResponse;
-import com.help.stockassistplatform.domain.stock.dto.StockSearchResponse;
 import com.help.stockassistplatform.domain.stock.dto.response.SliceResponse;
+import com.help.stockassistplatform.domain.stock.dto.response.StockAnalysisResponse;
+import com.help.stockassistplatform.domain.stock.dto.response.StockSearchResponse;
 import com.help.stockassistplatform.domain.stock.dto.response.StockSummaryDto;
 import com.help.stockassistplatform.domain.stock.indexed.entity.CompanyIndexed;
 import com.help.stockassistplatform.domain.stock.indexed.repository.CompanyIndexedRepository;
