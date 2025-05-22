@@ -38,4 +38,8 @@ public class StockPriceView {
 
 	private Float change;
 	private BigInteger marketCap;
+	private BigDecimal per;
+	private BigDecimal eps;
+	@Column(name = "dividend_yield")
+	private BigDecimal dividend;
 }

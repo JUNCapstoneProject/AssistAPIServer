@@ -32,4 +32,20 @@ public interface StockPriceViewRepository extends JpaRepository<StockPriceView, 
 
 	@Query(value = "SELECT ticker, name_kr FROM stock_vw ORDER BY market_cap DESC LIMIT 8", nativeQuery = true)
 	List<Object[]> findTop8TickerAndNameByMarketCap();
+
+	@Query(value = """
+		    SELECT *
+		    FROM stock_vw sp
+		    WHERE (sp.ticker, sp.posted_at) IN (
+		        SELECT ticker, MAX(posted_at)
+		        FROM stock_vw
+		        GROUP BY ticker
+		    )
+		    ORDER BY market_cap DESC
+		    LIMIT :limit OFFSET :offset
+		""", nativeQuery = true)
+	List<StockPriceView> findByMarketCapPaged(
+		@Param("limit") int limit,
+		@Param("offset") int offset
+	);
 }
