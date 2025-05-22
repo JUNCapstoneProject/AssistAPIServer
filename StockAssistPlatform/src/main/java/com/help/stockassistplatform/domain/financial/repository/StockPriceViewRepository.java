@@ -30,8 +30,19 @@ public interface StockPriceViewRepository extends JpaRepository<StockPriceView, 
 		""", nativeQuery = true)
 	List<StockPriceView> findNextGroupedByTicker(@Param("lastTicker") String lastTicker, @Param("limit") int limit);
 
-	@Query(value = "SELECT ticker, name_kr FROM stock_vw ORDER BY market_cap DESC LIMIT 8", nativeQuery = true)
-	List<Object[]> findTop8TickerAndNameByMarketCap();
+	@Query(value = """
+			SELECT s.ticker, s.name_kr
+			FROM stock_vw s
+			JOIN (
+				SELECT ticker, MAX(posted_at) AS latest_posted
+				FROM stock_vw
+				GROUP BY ticker
+			) latest ON s.ticker = latest.ticker AND s.posted_at = latest.latest_posted
+			WHERE CHAR_LENGTH(s.name_kr) <= 15
+			ORDER BY s.market_cap DESC
+			LIMIT 4
+		""", nativeQuery = true)
+	List<Object[]> findTop4TickerAndNameByMarketCap();
 
 	@Query(value = """
 		    SELECT *

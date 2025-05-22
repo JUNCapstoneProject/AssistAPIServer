@@ -22,17 +22,17 @@ public class AiAnalysisOrchestrator {
 	private final FinancialAnalysisViewRepository financialAnalysisViewRepository;
 
 	public List<StockAnalysisResponse> stockAnalysisResponses() {
-		final List<StockTickerNameDto> top8TickersByMarketCap = getTop8TickerAndName();
-		return getTop8StockAnalysis(top8TickersByMarketCap);
+		final List<StockTickerNameDto> top4TickersByMarketCap = getTop4TickerAndName();
+		return getTop4StockAnalysis(top4TickersByMarketCap);
 	}
 
-	private List<StockTickerNameDto> getTop8TickerAndName() {
-		return stockPriceViewRepository.findTop8TickerAndNameByMarketCap().stream()
+	private List<StockTickerNameDto> getTop4TickerAndName() {
+		return stockPriceViewRepository.findTop4TickerAndNameByMarketCap().stream()
 			.map(row -> new StockTickerNameDto((String)row[0], (String)row[1]))
 			.toList();
 	}
 
-	private List<StockAnalysisResponse> getTop8StockAnalysis(final List<StockTickerNameDto> stockInfos) {
+	private List<StockAnalysisResponse> getTop4StockAnalysis(final List<StockTickerNameDto> stockInfos) {
 		return stockInfos.stream()
 			.map(tickerNameDto -> {
 				final String ticker = tickerNameDto.ticker();
