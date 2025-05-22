@@ -15,5 +15,5 @@ FROM eclipse-temurin:17-jdk
 COPY --from=builder /home/gradle/AssistAPIServer/build/libs/*.jar app.jar
 
 # 애플리케이션 실행
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+ENTRYPOINT ["sh", "-c", "java -jar /app.jar --spring.profiles.active=$SPRING_PROFILES_ACTIVE"]
 EXPOSE 4003

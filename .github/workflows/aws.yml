@@ -58,7 +58,7 @@ env:
   KIS_APP_KEY: ${{ secrets.KIS_APP_KEY }}
   KIS_APP_SECRET: ${{ secrets.KIS_APP_SECRET }}
   KIS_CANO: ${{ secrets.KIS_CANO }}
-  ACTIVE_PROFILE: ${{ secrets.ACTIVE_PROFILE }}
+  SPRING_PROFILES_ACTIVE: prod
 
 jobs:
   deploy:
@@ -111,7 +111,7 @@ jobs:
            --arg KIS_APP_KEY "$KIS_APP_KEY" \
            --arg KIS_APP_SECRET "$KIS_APP_SECRET" \
            --arg KIS_CANO "$KIS_CANO" \
-           --arg ACTIVE_PROFILE "$ACTIVE_PROFILE" \
+           --arg SPRING_PROFILES_ACTIVE "$SPRING_PROFILES_ACTIVE" \
            '(.containerDefinitions[] | select(.name == "stockassist") | .environment) += [
              {"name": "DB_URL", "value": $DB_URL},
              {"name": "DB_USER", "value": $DB_USER},
@@ -126,7 +126,7 @@ jobs:
              {"name": "KIS_APP_KEY", "value": $KIS_APP_KEY},
              {"name": "KIS_APP_SECRET", "value": $KIS_APP_SECRET},
              {"name": "KIS_CANO", "value": $KIS_CANO},
-             {"name": "ACTIVE_PROFILE", "value": $ACTIVE_PROFILE}
+             {"name": "SPRING_PROFILES_ACTIVE", "value": $SPRING_PROFILES_ACTIVE}
            ]' "$ECS_TASK_DEFINITION" > ecs-task-definition-updated.json
 
     - name: Fill in image for stockassist container
