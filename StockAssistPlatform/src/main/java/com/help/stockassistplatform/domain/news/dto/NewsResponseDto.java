@@ -30,8 +30,8 @@ public class NewsResponseDto {
 
 	public static NewsResponseDto from(final NewsView newsView) {
 		final NewsResponseDto dto = new NewsResponseDto();
-		dto.category = Optional.ofNullable(newsView.getTag()).orElse("기타");
-		dto.status = newsView.getAiAnalysis();
+		dto.category = Optional.ofNullable(newsView.getTagsWithAnalysis()).orElse("기타");
+		dto.status = newsView.getTagsWithAnalysis();
 		dto.title = newsView.getTitle();
 		dto.description = summarize(newsView.getContent(), 100);
 		dto.source = newsView.getOrganization();
