@@ -44,13 +44,11 @@ public class UserService {
 		final CustomUser user,
 		final PasswordChangeRequestDto requestDto
 	) {
-		final User loginUser = userRepository.findByUsername(user.getUsername())
-			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+		final User loginUser = getUserByEmail(user.getUsername());
 		if (!passwordEncoder.matches(requestDto.oldPassword(), loginUser.getPassword())) {
 			throw new CustomException(ErrorCode.INVALID_PASSWORD);
 		}
 		loginUser.updatePassword(passwordEncoder.encode(requestDto.newPassword()));
-		userRepository.save(loginUser);
 		log.info("User password updated: {}", loginUser);
 	}
 
@@ -62,7 +60,7 @@ public class UserService {
 		log.info("User profile updated: {}", loginUser);
 	}
 
-	public User findUserByUsername(final String username) {
+	public User findUserWithProfileByUsername(final String username) {
 		return userRepository.findWithProfileByUsername(username)
 			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 	}
@@ -75,32 +73,30 @@ public class UserService {
 
 	@Transactional
 	public void deleteUser(final CustomUser user) {
-		final User loginUser = userRepository.findByUsername(user.getUsername())
-			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+		final User loginUser = getUserByEmail(user.getUsername());
 		userReportRepository.bulkDeleteByUser(loginUser);
 		userRepository.delete(loginUser);
 		log.info("User deleted: {}", loginUser);
 	}
 
+	public void validateEmailExistence(final String email) {
+		if (!userRepository.existsByUsername(email)) {
+			throw new CustomException(ErrorCode.USER_NOT_FOUND);
+		}
+	}
+
 	@Transactional
 	public void changeUserPassword(
-		final CustomUser user,
+		final String email,
 		final String newPassword
 	) {
-		final User loginUser = userRepository.findByUsername(user.getUsername())
-			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
-
+		final User loginUser = getUserByEmail(email);
 		loginUser.updatePassword(passwordEncoder.encode(newPassword));
-		userRepository.save(loginUser);
 		log.info("User password updated: {}", loginUser);
 	}
 
-	public void checkEmailOwnership(
-		final CustomUser user,
-		final String email
-	) {
-		if (!user.getUsername().equals(email)) {
-			throw new CustomException(ErrorCode.UNAUTHORIZED_PASSWORD_CHANGE);
-		}
+	private User getUserByEmail(final String email) {
+		return userRepository.findByUsername(email)
+			.orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 	}
 }

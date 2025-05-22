@@ -11,9 +11,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.help.stockassistplatform.domain.stock.dto.StockAnalysisResponse;
 import com.help.stockassistplatform.domain.stock.dto.StockAnalysisType;
 import com.help.stockassistplatform.domain.stock.dto.StockSearchResponse;
+import com.help.stockassistplatform.domain.stock.dto.response.SliceResponse;
+import com.help.stockassistplatform.domain.stock.dto.response.StockSummaryDto;
 import com.help.stockassistplatform.domain.stock.service.StockService;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
 
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -42,5 +45,14 @@ public class StockController {
 			case NEWS -> stockService.getStockAnalysis();
 		};
 		return ApiResponse.success(results);
+	}
+
+	@GetMapping("/marketcap")
+	public ApiResponse<SliceResponse<StockSummaryDto>> getStocksByMarketCap(
+		@RequestParam(defaultValue = "1") @Min(1L) final int page,
+		@RequestParam(defaultValue = "10") @Min(1L) final int size
+	) {
+		final SliceResponse<StockSummaryDto> response = stockService.getStocksByMarketCap(page, size);
+		return ApiResponse.success(response);
 	}
 }

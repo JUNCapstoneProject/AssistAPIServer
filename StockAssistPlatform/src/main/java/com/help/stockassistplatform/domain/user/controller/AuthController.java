@@ -1,7 +1,5 @@
 package com.help.stockassistplatform.domain.user.controller;
 
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,7 +16,6 @@ import com.help.stockassistplatform.domain.user.service.EmailVerificationService
 import com.help.stockassistplatform.domain.user.service.UserService;
 import com.help.stockassistplatform.domain.user.service.VerificationTokenService;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
-import com.help.stockassistplatform.global.jwt.CustomUser;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -70,10 +67,8 @@ public class AuthController {
 		return ApiResponse.success(new LoginCheckResponseDto(isLogin));
 	}
 
-	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/password-reset-request")
-	public ApiResponse<?> requestPasswordReset(@Valid @RequestBody final PasswordResetRequestDto resetRequestDto,
-		final HttpServletRequest request) {
+	public ApiResponse<?> requestPasswordReset(@Valid @RequestBody final PasswordResetRequestDto resetRequestDto) {
 		final String email = resetRequestDto.email();
 
 		final String token = tokenService.createToken();
@@ -82,15 +77,13 @@ public class AuthController {
 		return ApiResponse.success(null);
 	}
 
-	@PreAuthorize("isAuthenticated()")
 	@PostMapping("/password-reset")
 	public ApiResponse<?> confirmPasswordReset(
-		@AuthenticationPrincipal final CustomUser userDetail,
 		@Valid @RequestBody final PasswordResetConfirmDto request
 	) {
 		final String email = tokenService.getResetEmailFromRedis(request.token());
-		userService.checkEmailOwnership(userDetail, email);
-		userService.changeUserPassword(userDetail, request.newPassword());
+		userService.validateEmailExistence(email);
+		userService.changeUserPassword(email, request.newPassword());
 		return ApiResponse.success(null);
 	}
 }
