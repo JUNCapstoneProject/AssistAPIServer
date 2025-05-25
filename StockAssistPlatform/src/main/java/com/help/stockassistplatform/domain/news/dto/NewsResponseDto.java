@@ -2,8 +2,10 @@ package com.help.stockassistplatform.domain.news.dto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
 
 import com.help.stockassistplatform.domain.news.entity.NewsView;
 
@@ -11,33 +13,41 @@ import lombok.Getter;
 
 @Getter
 public class NewsResponseDto {
-	private String category;
-	private String status;
+	private List<CategoryStatusDto> categories;
 	private String title;
 	private String description;
 	private String source;
 	private String date;
 	private String link;
-	/*
-	*   "category": "테슬라",
-        "status": "긍정",
-        "title": "테슬라, 자율주행 기술 업데이트로 주가 상승",
-        "description": "테슬라가 최신 자율주행 소프트웨어 업데이트를 발표하며 주가가 3% 상승했습니다.",
-        "source": "블룸버그",
-        "date": "2024.03.08",
-        "link": "https://example.com/news1"
-	* */
 
 	public static NewsResponseDto from(final NewsView newsView) {
 		final NewsResponseDto dto = new NewsResponseDto();
-		dto.category = Optional.ofNullable(newsView.getTag()).orElse("기타");
-		dto.status = newsView.getAiAnalysis();
+		dto.categories = parseCategories(newsView.getTagsWithAnalysis());
 		dto.title = newsView.getTitle();
 		dto.description = summarize(newsView.getContent(), 100);
 		dto.source = newsView.getOrganization();
 		dto.date = formatDate(newsView.getPostedAt());
 		dto.link = newsView.getUrl();
 		return dto;
+	}
+
+	private static List<CategoryStatusDto> parseCategories(final String tagsWithAnalysis) {
+		if (null == tagsWithAnalysis || tagsWithAnalysis.isBlank()) {
+			return Collections.emptyList();
+		}
+		
+		return Arrays.stream(tagsWithAnalysis.split(","))
+			.map(String::trim)
+			.filter(entry -> entry.contains(":"))
+			.map(NewsResponseDto::toCategoryStatusDto)
+			.toList();
+	}
+
+	private static CategoryStatusDto toCategoryStatusDto(final String entry) {
+		final String[] parts = entry.split(":", 2);
+		final String name = parts[0];
+		final String status = (parts.length > 1 && !parts[1].isBlank()) ? parts[1] : "분석 결과 없음";
+		return new CategoryStatusDto(name, status);
 	}
 
 	private static String formatDate(final LocalDateTime dateTime) {
