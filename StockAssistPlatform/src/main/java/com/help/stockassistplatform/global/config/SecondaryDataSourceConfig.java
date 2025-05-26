@@ -52,6 +52,14 @@ public class SecondaryDataSourceConfig {
 		config.setPassword(dbPassword);
 		config.setDriverClassName("com.mysql.cj.jdbc.Driver");
 		config.setTransactionIsolation("TRANSACTION_READ_COMMITTED");
+
+		config.setMaximumPoolSize(10);
+		config.setConnectionTimeout(10000);
+		config.setIdleTimeout(60000);
+		config.setMaxLifetime(270000);                         // MySQL wait_timeout(28800s)보다 작게 (4.5분)
+		config.setValidationTimeout(5000);
+		config.setConnectionTestQuery("SELECT 1");
+
 		return new HikariDataSource(config);
 	}
 
