@@ -22,7 +22,7 @@ public class StockPriceView {
 	@Column(name = "crawling_id")
 	private String crawlingId;
 
-	@Column(name = "posted_at") // ← 실제 DB 컬럼 이름이 이거일 가능성 높음. 확인 필요!
+	@Column(name = "posted_at")
 	private LocalDateTime postedAt;
 
 	@Column(name = "name_kr")
