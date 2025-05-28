@@ -70,12 +70,12 @@ public class StockController {
 
 	@GetMapping("/prices")
 	public ApiResponse<?> getPriceTimeSeries(
-		@RequestParam final String symbols,
+		@RequestParam final String symbol,
 		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
 		@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
 		@RequestParam String period) {
 
-		final StockPriceTimeSeriesResponse response = stockQueryService.getPriceTimeSeries(symbols, start, end, period);
+		final StockPriceTimeSeriesResponse response = stockQueryService.getPriceTimeSeries(symbol, start, end, period);
 		return ApiResponse.success(response);
 	}
 }

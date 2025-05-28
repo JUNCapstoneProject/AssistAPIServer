@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.help.stockassistplatform.domain.financial.entity.StockPriceView;
-import com.help.stockassistplatform.domain.stock.dto.response.StockPriceTimeSeriesResponse.TimeSeriesData;
+import com.help.stockassistplatform.domain.stock.dto.response.TimeSeriesData;
 
 import lombok.extern.slf4j.Slf4j;
 

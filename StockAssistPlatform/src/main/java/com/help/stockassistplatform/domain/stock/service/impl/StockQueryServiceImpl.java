@@ -3,7 +3,9 @@ package com.help.stockassistplatform.domain.stock.service.impl;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.stereotype.Service;
@@ -12,9 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.help.stockassistplatform.domain.financial.entity.StockPriceView;
 import com.help.stockassistplatform.domain.financial.repository.StockPriceViewRepository;
 import com.help.stockassistplatform.domain.stock.dto.response.StockPriceTimeSeriesResponse;
-import com.help.stockassistplatform.domain.stock.dto.response.StockPriceTimeSeriesResponse.TimeSeriesData;
 import com.help.stockassistplatform.domain.stock.dto.response.StockSummaryDto;
 import com.help.stockassistplatform.domain.stock.dto.response.StockSummaryResponse;
+import com.help.stockassistplatform.domain.stock.dto.response.TimeSeriesData;
 import com.help.stockassistplatform.domain.stock.service.StockQueryService;
 import com.help.stockassistplatform.global.common.IntervalResolver;
 import com.help.stockassistplatform.global.common.TimeSeriesGrouper;
@@ -49,7 +51,14 @@ public class StockQueryServiceImpl implements StockQueryService {
 	) {
 		final String interval = IntervalResolver.resolve(period);
 		final List<StockPriceView> raw = stockPriceViewRepository.findAllInPeriod(symbol, start, end);
-		final List<TimeSeriesData> timeSeries = TimeSeriesGrouper.group(raw, start, end, interval);
+		final List<Map<String, Object>> timeSeries = TimeSeriesGrouper.group(raw, start, end, interval).stream()
+			.map(d -> {
+				Map<String, Object> map = new LinkedHashMap<>();
+				map.put("date", d.date());
+				map.put(symbol, d.price());
+				return map;
+			})
+			.toList();
 		return new StockPriceTimeSeriesResponse(timeSeries, interval);
 	}
 
