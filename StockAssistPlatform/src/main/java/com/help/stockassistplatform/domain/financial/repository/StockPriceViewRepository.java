@@ -68,7 +68,7 @@ public interface StockPriceViewRepository extends JpaRepository<StockPriceView, 
 		      AND posted_at BETWEEN :start AND :end
 		    ORDER BY posted_at ASC
 		""", nativeQuery = true)
-	List<StockPriceView> findTimeSeriesByTickerAndDateRange(
+	List<StockPriceView> findAllInPeriod(
 		@Param("ticker") String ticker,
 		@Param("start") LocalDate start,
 		@Param("end") LocalDate end
