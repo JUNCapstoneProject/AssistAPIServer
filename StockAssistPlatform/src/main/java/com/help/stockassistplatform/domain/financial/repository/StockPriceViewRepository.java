@@ -1,5 +1,6 @@
 package com.help.stockassistplatform.domain.financial.repository;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,4 +60,19 @@ public interface StockPriceViewRepository extends JpaRepository<StockPriceView, 
 		@Param("limit") int limit,
 		@Param("offset") int offset
 	);
+
+	@Query(value = """
+		    SELECT *
+		    FROM stock_vw
+		    WHERE ticker = :ticker
+		      AND posted_at BETWEEN :start AND :end
+		    ORDER BY posted_at ASC
+		""", nativeQuery = true)
+	List<StockPriceView> findTimeSeriesByTickerAndDateRange(
+		@Param("ticker") String ticker,
+		@Param("start") Date start,
+		@Param("end") Date end
+	);
+
+	List<StockPriceView> findByTickerIn(List<String> tickers);
 }
