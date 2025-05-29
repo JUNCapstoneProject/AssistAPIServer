@@ -24,6 +24,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.help.stockassistplatform.domain.news.exception.NewsNotFoundException;
 import com.help.stockassistplatform.domain.report.exception.ReportNotFoundException;
+import com.help.stockassistplatform.domain.stock.exception.NotSupportedPeriodException;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
 
 import jakarta.validation.ConstraintViolationException;
@@ -160,6 +161,14 @@ public class GlobalExceptionHandler {
 		return ResponseEntity
 			.status(ErrorCode.NOT_FOUND.getStatus())
 			.body(ApiResponse.error(ErrorCode.NOT_FOUND));
+	}
+
+	@ExceptionHandler(NotSupportedPeriodException.class)
+	public ResponseEntity<ApiResponse<?>> handleNotSupportedPeriodException(final NotSupportedPeriodException ex) {
+		log.error("NotSupportedPeriodException : {}", ex.getMessage());
+		return ResponseEntity
+			.status(HttpStatus.BAD_REQUEST)
+			.body(ApiResponse.error(ex.getMessage(), HttpStatus.BAD_REQUEST));
 	}
 
 	@ExceptionHandler(CustomException.class)

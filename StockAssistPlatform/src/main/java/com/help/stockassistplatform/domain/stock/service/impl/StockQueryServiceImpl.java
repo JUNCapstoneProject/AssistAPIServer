@@ -17,6 +17,7 @@ import com.help.stockassistplatform.domain.stock.dto.response.StockPriceTimeSeri
 import com.help.stockassistplatform.domain.stock.dto.response.StockSummaryDto;
 import com.help.stockassistplatform.domain.stock.dto.response.StockSummaryResponse;
 import com.help.stockassistplatform.domain.stock.dto.response.TimeSeriesData;
+import com.help.stockassistplatform.domain.stock.exception.NotSupportedPeriodException;
 import com.help.stockassistplatform.domain.stock.service.StockQueryService;
 import com.help.stockassistplatform.global.common.IntervalResolver;
 import com.help.stockassistplatform.global.common.TimeSeriesGrouper;
@@ -92,7 +93,7 @@ public class StockQueryServiceImpl implements StockQueryService {
 					case "daily" -> periodStart;
 					case "weekly" -> periodStart.plusDays(6);
 					case "monthly" -> periodStart.withDayOfMonth(periodStart.lengthOfMonth());
-					default -> throw new IllegalArgumentException("지원하지 않는 interval: " + interval);
+					default -> throw new NotSupportedPeriodException(interval);
 				};
 				log.debug(periodStart.toString());
 				log.debug(periodEnd.toString());
