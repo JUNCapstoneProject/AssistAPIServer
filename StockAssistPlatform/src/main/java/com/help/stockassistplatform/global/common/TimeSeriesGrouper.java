@@ -43,7 +43,7 @@ public class TimeSeriesGrouper {
 						return !date.isBefore(periodStart) && !date.isAfter(periodEnd);
 					})
 					.min(Comparator.comparing(StockPriceView::getPostedAt))
-					.map(view -> new TimeSeriesData(view.getPostedAt().toLocalDate(), view.getClose()))
+					.map(view -> new TimeSeriesData(view.getPostedAt().toLocalDate(), view.getPrice()))
 					.orElse(null);
 			})
 			.filter(Objects::nonNull)

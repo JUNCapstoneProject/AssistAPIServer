@@ -2,7 +2,6 @@ package com.help.stockassistplatform.domain.financial.entity;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.time.LocalDateTime;
 
 import org.hibernate.annotations.Immutable;
 
@@ -17,27 +16,20 @@ import lombok.Getter;
 @Immutable
 @Getter
 public class StockPriceView {
-
 	@Id
-	@Column(name = "crawling_id")
-	private String crawlingId;
-
-	@Column(name = "posted_at")
-	private LocalDateTime postedAt;
+	@Column(name = "ticker")
+	private String ticker;
 
 	@Column(name = "name_kr")
 	private String name;
 
-	private String ticker;
-
-	private BigDecimal open;
-	private BigDecimal high;
-	private BigDecimal low;
-	private BigDecimal close;
+	@Column(name = "price")
+	private BigDecimal price;
 	private Long volume;
 
 	private Float change;
 	private BigInteger marketCap;
+	@Column(name = "pe")
 	private BigDecimal per;
 	private BigDecimal eps;
 	@Column(name = "dividend_yield")

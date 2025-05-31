@@ -103,7 +103,7 @@ public class StockQueryServiceImpl implements StockQueryService {
 						return !date.isBefore(periodStart) && !date.isAfter(periodEnd);
 					})
 					.min(Comparator.comparing(StockPriceView::getPostedAt))  // 최신
-					.map(view -> new TimeSeriesData(view.getPostedAt().toLocalDate(), view.getClose()))
+					.map(view -> new TimeSeriesData(view.getPostedAt().toLocalDate(), view.getPrice()))
 					.orElse(null);
 			})
 			.filter(Objects::nonNull)
