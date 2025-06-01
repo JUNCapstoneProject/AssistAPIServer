@@ -48,7 +48,7 @@ public class FinancialServiceImpl implements FinancialService {
 
 	@Override
 	public FinancialDetailResponse getDetailByTicker(String ticker) {
-		StockPriceView price = stockPriceViewRepository.findTop1ByTickerOrderByPostedAtDesc(ticker)
+		StockPriceView price = stockPriceViewRepository.findOneByTicker(ticker)
 			.orElseThrow(() -> new CustomException(ErrorCode.TICKER_NOT_FOUND));
 
 		String name = price.getName();
