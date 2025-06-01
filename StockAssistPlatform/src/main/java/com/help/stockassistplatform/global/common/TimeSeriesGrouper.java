@@ -1,12 +1,12 @@
 package com.help.stockassistplatform.global.common;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
-import com.help.stockassistplatform.domain.financial.entity.StockPriceView;
+import com.help.stockassistplatform.domain.financial.entity.StockChartView;
 import com.help.stockassistplatform.domain.stock.dto.response.TimeSeriesData;
 
 import lombok.extern.slf4j.Slf4j;
@@ -19,54 +19,34 @@ public class TimeSeriesGrouper {
 	}
 
 	public static List<TimeSeriesData> group(
-		final List<StockPriceView> raw,
+		final List<StockChartView> raw,
 		final LocalDate start,
 		final LocalDate end,
 		final String interval
 	) {
-		final List<LocalDate> boundaries = createPeriodBoundaries(start, end, interval);
+		Map<LocalDate, StockChartView> earliest = new LinkedHashMap<>();
 
-		return boundaries.stream()
-			.map(periodStart -> {
-				final LocalDate periodEnd = switch (interval) {
-					case "daily" -> periodStart;
-					case "weekly" -> periodStart.plusDays(6);
-					case "monthly" -> periodStart.withDayOfMonth(periodStart.lengthOfMonth());
-					default -> throw new IllegalArgumentException("지원하지 않는 interval: " + interval);
-				};
+		for (StockChartView v : raw) {
+			LocalDate date = v.getPostedAt().toLocalDate();
+			if (date.isBefore(start) || date.isAfter(end))
+				continue;
 
-				log.debug("Grouping: {} ~ {}", periodStart, periodEnd);
-
-				return raw.stream()
-					.filter(r -> {
-						LocalDate date = r.getPostedAt().toLocalDate();
-						return !date.isBefore(periodStart) && !date.isAfter(periodEnd);
-					})
-					.min(Comparator.comparing(StockPriceView::getPostedAt))
-					.map(view -> new TimeSeriesData(view.getPostedAt().toLocalDate(), view.getPrice()))
-					.orElse(null);
-			})
-			.filter(Objects::nonNull)
-			.toList();
-	}
-
-	private static List<LocalDate> createPeriodBoundaries(
-		LocalDate start,
-		LocalDate end,
-		String interval
-	) {
-		final List<LocalDate> boundaries = new ArrayList<>();
-		LocalDate cursor = start;
-
-		while (!cursor.isAfter(end)) {
-			boundaries.add(cursor);
-			cursor = switch (interval) {
-				case "daily" -> cursor.plusDays(1);
-				case "weekly" -> cursor.plusWeeks(1);
-				case "monthly" -> cursor.plusMonths(1);
+			LocalDate bucket = switch (interval) {
+				case "daily" -> date;
+				case "weekly" -> date.with(DayOfWeek.MONDAY);
+				case "monthly" -> date.withDayOfMonth(1);
 				default -> throw new IllegalArgumentException("지원하지 않는 interval: " + interval);
 			};
+
+			earliest.compute(bucket,
+				(k, old) -> old == null || v.getPostedAt().isBefore(old.getPostedAt()) ? v : old);
 		}
-		return boundaries;
+
+		return earliest.entrySet().stream()
+			.sorted(Map.Entry.comparingByKey())
+			.map(e -> new TimeSeriesData(
+				e.getValue().getPostedAt().toLocalDate(),
+				e.getValue().getAdjClose()))
+			.toList();
 	}
 }
