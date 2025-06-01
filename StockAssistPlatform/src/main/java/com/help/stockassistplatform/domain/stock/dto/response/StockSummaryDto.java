@@ -21,7 +21,7 @@ public record StockSummaryDto(
 			view.getName(),
 			view.getTicker(),
 			view.getMarketCap(),
-			view.getClose(),
+			view.getPrice(),
 			view.getChange(),
 			view.getVolume(),
 			view.getPer(),
