@@ -40,11 +40,8 @@ public class NewsView {
 	@Column(name = "content")
 	private String content;
 
-	@Column(name = "tag")
-	private String tag;
-
-	@Column(name = "ai_analysis")
-	private String aiAnalysis;
+	@Column(name = "tag_analysis")
+	private String tagsWithAnalysis;
 
 	@Column(name = "target_url")
 	private String url;

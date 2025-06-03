@@ -18,11 +18,13 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.help.stockassistplatform.domain.news.exception.NewsNotFoundException;
 import com.help.stockassistplatform.domain.report.exception.ReportNotFoundException;
+import com.help.stockassistplatform.domain.stock.exception.NotSupportedPeriodException;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
 
 import jakarta.validation.ConstraintViolationException;
@@ -45,6 +47,17 @@ public class GlobalExceptionHandler {
 		return ResponseEntity
 			.status(ErrorCode.INVALID_CREDENTIALS.getStatus())
 			.body(ApiResponse.error(ErrorCode.INVALID_CREDENTIALS));
+	}
+
+	@ExceptionHandler(HandlerMethodValidationException.class)
+	public ResponseEntity<ApiResponse<?>> handleHandlerMethodValidationException(
+		final HandlerMethodValidationException ex
+	) {
+		log.error("HandlerMethodValidationException : {}", ex.getMessage());
+
+		return ResponseEntity
+			.status(HttpStatus.BAD_REQUEST)
+			.body(ApiResponse.error("Parameter Validation error", HttpStatus.BAD_REQUEST));
 	}
 
 	@ExceptionHandler(NoHandlerFoundException.class)
@@ -149,7 +162,15 @@ public class GlobalExceptionHandler {
 			.status(ErrorCode.NOT_FOUND.getStatus())
 			.body(ApiResponse.error(ErrorCode.NOT_FOUND));
 	}
-	
+
+	@ExceptionHandler(NotSupportedPeriodException.class)
+	public ResponseEntity<ApiResponse<?>> handleNotSupportedPeriodException(final NotSupportedPeriodException ex) {
+		log.error("NotSupportedPeriodException : {}", ex.getMessage());
+		return ResponseEntity
+			.status(HttpStatus.BAD_REQUEST)
+			.body(ApiResponse.error(ex.getMessage(), HttpStatus.BAD_REQUEST));
+	}
+
 	@ExceptionHandler(CustomException.class)
 	public ResponseEntity<ApiResponse<?>> handleCustomException(final CustomException ex) {
 		log.error("CustomException : {}", ex.getMessage());

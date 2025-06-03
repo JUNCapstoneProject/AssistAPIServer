@@ -25,7 +25,7 @@ public class NewsService {
 		if (null == tag || tag.isBlank()) {
 			slice = newsRepository.findAllBy(pageable);
 		} else {
-			slice = newsRepository.findByTag(tag, pageable);
+			slice = newsRepository.findByTagInTagsWithAnalysis(tag, pageable);
 		}
 
 		if (slice.isEmpty())

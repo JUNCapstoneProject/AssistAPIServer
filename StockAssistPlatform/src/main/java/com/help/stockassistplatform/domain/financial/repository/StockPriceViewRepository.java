@@ -13,23 +13,37 @@ import com.help.stockassistplatform.domain.financial.entity.StockPriceView;
 @Repository
 public interface StockPriceViewRepository extends JpaRepository<StockPriceView, String> {
 
-	Optional<StockPriceView> findTop1ByTickerOrderByPostedAtDesc(String ticker);
+	Optional<StockPriceView> findOneByTicker(String ticker);
 
 	// ✅ Keyset 기반 슬라이싱 쿼리
 	@Query(value = """
 		    SELECT sp.*
 		    FROM stock_vw sp
-		    INNER JOIN (
-		        SELECT ticker, MAX(posted_at) AS latest_posted_at
-		        FROM stock_vw
-		        GROUP BY ticker
-		    ) latest ON sp.ticker = latest.ticker AND sp.posted_at = latest.latest_posted_at
 		    WHERE (:lastTicker IS NULL OR sp.ticker > :lastTicker)
 		    ORDER BY sp.ticker
 		    LIMIT :limit
 		""", nativeQuery = true)
 	List<StockPriceView> findNextGroupedByTicker(@Param("lastTicker") String lastTicker, @Param("limit") int limit);
 
-	@Query(value = "SELECT ticker, name_kr FROM stock_vw ORDER BY market_cap DESC LIMIT 8", nativeQuery = true)
-	List<Object[]> findTop8TickerAndNameByMarketCap();
+	@Query(value = """
+			SELECT s.ticker, s.name_kr
+			FROM stock_vw s
+			WHERE CHAR_LENGTH(s.name_kr) <= 15
+			ORDER BY s.market_cap DESC
+			LIMIT 4
+		""", nativeQuery = true)
+	List<Object[]> findTop4TickerAndNameByMarketCap();
+
+	@Query(value = """
+		    SELECT *
+		    FROM stock_vw sp
+		    ORDER BY market_cap DESC
+		    LIMIT :limit OFFSET :offset
+		""", nativeQuery = true)
+	List<StockPriceView> findByMarketCapPaged(
+		@Param("limit") int limit,
+		@Param("offset") int offset
+	);
+
+	List<StockPriceView> findByTickerIn(List<String> tickers);
 }
