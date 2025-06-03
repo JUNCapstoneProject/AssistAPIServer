@@ -71,16 +71,9 @@ public class SecurityConfig {
 		// 	"http://192.168.25.93:5173"
 		// ));
 		configuration.setAllowedOriginPatterns(List.of("*"));
-
+		
 		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-		configuration.setAllowedHeaders(List.of(
-			"Origin",
-			"X-Requested-With",
-			"Content-Type",
-			"Accept",
-			"Destination",
-			"Authorization"
-		));
+		configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
 		configuration.setExposedHeaders(List.of("Authorization"));
 		configuration.setAllowCredentials(true);
 
