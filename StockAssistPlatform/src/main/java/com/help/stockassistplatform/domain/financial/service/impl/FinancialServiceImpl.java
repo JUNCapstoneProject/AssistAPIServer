@@ -39,9 +39,9 @@ public class FinancialServiceImpl implements FinancialService {
         BigDecimal close = price.getClose();
         Float change = price.getChange();
 
-        String status = analysisRepository.findLatestByCompanyOrderByPostedAtDesc(ticker)
+        Integer status = analysisRepository.findLatestByCompanyOrderByPostedAtDesc(ticker)
                 .map(FinancialAnalysisView::getAiAnalysis)
-                .orElse("중립");
+                .orElse(null);
 
         List<FinancialItemResponse> incomeList = FinancialMapper.mapIncome(
                 incomeRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
@@ -102,7 +102,7 @@ public class FinancialServiceImpl implements FinancialService {
                         ticker,
                         stock.getClose(),
                         stock.getChange(),
-                        Optional.ofNullable(analysisMap.get(ticker)).map(FinancialAnalysisView::getAiAnalysis).orElse("중립"),
+                        Optional.ofNullable(analysisMap.get(ticker)).map(FinancialAnalysisView::getAiAnalysis).orElse(null),
                         FinancialMapper.mapIncome(incomeMap.get(ticker)),
                         FinancialMapper.mapBalance(balanceMap.get(ticker)),
                         FinancialMapper.mapCash(cashMap.get(ticker)),

@@ -23,6 +23,6 @@ public class FinancialAnalysisView {
     private LocalDateTime postedAt;
 
     @Column(name = "ai_analysis")
-    private String aiAnalysis;
+    private Integer aiAnalysis;
 
 }
