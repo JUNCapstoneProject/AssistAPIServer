@@ -26,60 +26,48 @@ import lombok.RequiredArgsConstructor;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-	private final JwtAuthenticationFilter jwtAuthenticationFilter;
-	private final EmailVerificationFilter emailVerificationFilter;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final EmailVerificationFilter emailVerificationFilter;
 
-	// TODO: CSRF 토큰 사용 시 주석 해제
-	// @Bean
-	// public CsrfTokenRepository csrfTokenRepository() {
-	// 	HttpSessionCsrfTokenRepository repository = new HttpSessionCsrfTokenRepository();
-	// 	repository.setHeaderName("X-XSRF-TOKEN");
-	// 	return repository;
-	// }
+    @Bean
+    public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
+        http.csrf(AbstractHttpConfigurer::disable);
+        http.sessionManagement(session -> session
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        );
+        http.cors(corsCustomizer -> corsCustomizer.configurationSource(configurationSource()));
+        http.formLogin(AbstractHttpConfigurer::disable);
+        http.authorizeHttpRequests((authorize) ->
+            authorize.requestMatchers("/**").permitAll()
+                .anyRequest().authenticated()
+        );
+        http.addFilterBefore(jwtAuthenticationFilter, ExceptionTranslationFilter.class)
+            .addFilterBefore(emailVerificationFilter, JwtAuthenticationFilter.class);
+        return http.build();
+    }
 
-	@Bean
-	public SecurityFilterChain filterChain(final HttpSecurity http) throws Exception {
-		// http.csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository())
-		// 	.ignoringRequestMatchers("/login")
-		// )
-		http.csrf(AbstractHttpConfigurer::disable);
-		http.sessionManagement(session -> session
-			.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-		);
-		http.cors(corsCustomizer -> corsCustomizer.configurationSource(configurationSource()));
-		http.formLogin(AbstractHttpConfigurer::disable);
-		http.authorizeHttpRequests((authorize) ->
-			authorize.requestMatchers("/**").permitAll()
-				.anyRequest().authenticated()
-		);
-		http.addFilterBefore(jwtAuthenticationFilter, ExceptionTranslationFilter.class)
-			.addFilterBefore(emailVerificationFilter, JwtAuthenticationFilter.class);
-		return http.build();
-	}
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
 
-	@Bean
-	PasswordEncoder passwordEncoder() {
-		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
-	}
+    @Bean
+    public CorsConfigurationSource configurationSource() {
+        final CorsConfiguration configuration = new CorsConfiguration();
 
-	@Bean
-	public CorsConfigurationSource configurationSource() {
-		final CorsConfiguration configuration = new CorsConfiguration();
+        // ✅ 명시적 origin 설정 (와일드카드 사용 금지)
+        configuration.setAllowedOrigins(List.of(
+            "https://developer.tuzain.com",
+            "https://www.tuzain.com"
+        ));
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Destination"));
+        configuration.setExposedHeaders(List.of("Authorization"));
 
-		// 프론트엔드 서버 주소
-		// configuration.setAllowedOrigins(List.of(
-		// 	"http://192.168.25.93:5173"
-		// ));
-		configuration.setAllowedOriginPatterns(List.of("*"));
-		
-		configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-		configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-		configuration.setExposedHeaders(List.of("Authorization"));
-		configuration.setAllowCredentials(true);
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
 
-		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-		source.registerCorsConfiguration("/**", configuration);
-
-		return source;
-	}
+        return source;
+    }
 }
