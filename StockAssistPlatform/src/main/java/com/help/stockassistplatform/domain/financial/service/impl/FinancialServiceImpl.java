@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,9 +56,9 @@ public class FinancialServiceImpl implements FinancialService {
 		BigDecimal close = price.getPrice();
 		Float change = price.getChange();
 
-		String status = analysisRepository.findLatestByCompanyOrderByPostedAtDesc(ticker)
+		Integer status = analysisRepository.findLatestByCompanyOrderByPostedAtDesc(ticker)
 			.map(FinancialAnalysisView::getAiAnalysis)
-			.orElse("중립");
+			.orElse(null);
 
 		List<FinancialItemResponse> incomeList = FinancialMapper.mapIncome(
 			incomeRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
@@ -76,66 +77,65 @@ public class FinancialServiceImpl implements FinancialService {
 
 	@Override
 	public FinancialListResponse getListByPage(int page) {
-		String lastTicker = null;
-		int currentIndex = 0;
-		int startIndex = (page - 1) * PAGE_SIZE;
+		int pageSize = PAGE_SIZE;
+		int offset = (page - 1) * pageSize;
 
-		List<FinancialDetailResponse> financials = new ArrayList<>();
-		boolean hasNext = false;
+		// 1. 페이지에 해당하는 ticker 목록
+		List<String> tickers = stockPriceViewRepository.findPagedTickers(pageSize, offset);
 
-		outer:
-		while (true) {
-			List<StockPriceView> slice = stockPriceViewRepository.findNextGroupedByTicker(lastTicker, PAGE_SIZE);
-			if (slice.isEmpty())
-				break;
-
-			lastTicker = slice.get(slice.size() - 1).getTicker();
-			List<String> tickers = slice.stream().map(StockPriceView::getTicker).toList();
-
-			Map<String, FinancialAnalysisView> analysisMap = analysisRepository.findLatestByTickers(tickers).stream()
-				.collect(Collectors.toMap(FinancialAnalysisView::getCompany, v -> v));
-
-			Map<String, List<IncomeStatementView>> incomeMap = incomeRepository.findRecent2ByTickers(tickers).stream()
-				.collect(Collectors.groupingBy(IncomeStatementView::getCompany));
-			Map<String, List<BalanceSheetView>> balanceMap = balanceRepository.findRecent2ByTickers(tickers).stream()
-				.collect(Collectors.groupingBy(BalanceSheetView::getCompany));
-			Map<String, List<CashFlowView>> cashMap = cashRepository.findRecent2ByTickers(tickers).stream()
-				.collect(Collectors.groupingBy(CashFlowView::getCompany));
-			Map<String, List<FinancialRatioView>> ratioMap = ratioRepository.findRecent2ByTickers(tickers).stream()
-				.collect(Collectors.groupingBy(FinancialRatioView::getCompany));
-
-			for (StockPriceView stock : slice) {
-				String ticker = stock.getTicker();
-
-				if (!incomeMap.containsKey(ticker) || !balanceMap.containsKey(ticker)
-					|| !cashMap.containsKey(ticker) || !ratioMap.containsKey(ticker)) {
-					continue;
-				}
-
-				if (currentIndex++ < startIndex)
-					continue;
-
-				financials.add(FinancialDetailResponse.from(
-					stock.getName(),
-					ticker,
-					stock.getPrice(),
-					stock.getChange(),
-					Optional.ofNullable(analysisMap.get(ticker)).map(FinancialAnalysisView::getAiAnalysis).orElse("중립"),
-					FinancialMapper.mapIncome(incomeMap.get(ticker)),
-					FinancialMapper.mapBalance(balanceMap.get(ticker)),
-					FinancialMapper.mapCash(cashMap.get(ticker)),
-					FinancialMapper.mapRatio(ratioMap.get(ticker))
-				));
-
-				if (financials.size() == PAGE_SIZE) {
-					hasNext = true;  // 더 가져올 수 있는 ticker가 있을 가능성
-					break outer;
-				}
-			}
+		if (tickers.isEmpty()) {
+			throw new CustomException(ErrorCode.NOT_FOUND);
 		}
 
+		// 2. batch 조회
+		Map<String, StockPriceView> priceMap = stockPriceViewRepository.findByTickerIn(tickers).stream()
+				.collect(Collectors.toMap(StockPriceView::getTicker, s -> s));
+
+		Map<String, FinancialAnalysisView> analysisMap = analysisRepository.findLatestByTickers(tickers).stream()
+				.collect(Collectors.toMap(FinancialAnalysisView::getCompany, a -> a));
+
+		Map<String, List<IncomeStatementView>> incomeMap = incomeRepository.findRecent2ByTickers(tickers).stream()
+				.collect(Collectors.groupingBy(IncomeStatementView::getCompany));
+
+		Map<String, List<BalanceSheetView>> balanceMap = balanceRepository.findRecent2ByTickers(tickers).stream()
+				.collect(Collectors.groupingBy(BalanceSheetView::getCompany));
+
+		Map<String, List<CashFlowView>> cashMap = cashRepository.findRecent2ByTickers(tickers).stream()
+				.collect(Collectors.groupingBy(CashFlowView::getCompany));
+
+		Map<String, List<FinancialRatioView>> ratioMap = ratioRepository.findRecent2ByTickers(tickers).stream()
+				.collect(Collectors.groupingBy(FinancialRatioView::getCompany));
+
+		// 3. 조립
+		List<FinancialDetailResponse> financials = tickers.stream()
+				.map(ticker -> {
+					StockPriceView stock = priceMap.get(ticker);
+					if (stock == null) return null;
+
+					if (!incomeMap.containsKey(ticker) || !balanceMap.containsKey(ticker)
+							|| !cashMap.containsKey(ticker) || !ratioMap.containsKey(ticker)) {
+						return null;
+					}
+
+					return FinancialDetailResponse.from(
+							stock.getName(),
+							ticker,
+							stock.getPrice(),
+							stock.getChange(),
+							Optional.ofNullable(analysisMap.get(ticker)).map(FinancialAnalysisView::getAiAnalysis).orElse(null),
+							FinancialMapper.mapIncome(incomeMap.get(ticker)),
+							FinancialMapper.mapBalance(balanceMap.get(ticker)),
+							FinancialMapper.mapCash(cashMap.get(ticker)),
+							FinancialMapper.mapRatio(ratioMap.get(ticker))
+					);
+				})
+				.filter(Objects::nonNull)
+				.toList();
+
+		boolean hasNext = financials.size() == pageSize;
+
 		if (financials.isEmpty()) {
-			throw new CustomException(ErrorCode.NOT_FOUND); // 페이지를 찾을 수 없습니다
+			throw new CustomException(ErrorCode.NOT_FOUND);
 		}
 
 		return FinancialListResponse.from(financials, page, hasNext);

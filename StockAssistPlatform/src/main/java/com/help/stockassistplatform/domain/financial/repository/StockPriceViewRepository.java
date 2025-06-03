@@ -15,15 +15,13 @@ public interface StockPriceViewRepository extends JpaRepository<StockPriceView, 
 
 	Optional<StockPriceView> findOneByTicker(String ticker);
 
-	// ✅ Keyset 기반 슬라이싱 쿼리
 	@Query(value = """
-		    SELECT sp.*
-		    FROM stock_vw sp
-		    WHERE (:lastTicker IS NULL OR sp.ticker > :lastTicker)
-		    ORDER BY sp.ticker
-		    LIMIT :limit
-		""", nativeQuery = true)
-	List<StockPriceView> findNextGroupedByTicker(@Param("lastTicker") String lastTicker, @Param("limit") int limit);
+		SELECT sp.ticker
+		FROM stock_vw sp
+		ORDER BY sp.market_cap DESC
+		LIMIT :limit OFFSET :offset
+	""", nativeQuery = true)
+	List<String> findPagedTickers(@Param("limit") int limit, @Param("offset") int offset);
 
 	@Query(value = """
 			SELECT s.ticker, s.name_kr
