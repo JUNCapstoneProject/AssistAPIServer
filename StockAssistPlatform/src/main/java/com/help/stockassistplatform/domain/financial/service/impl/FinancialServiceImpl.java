@@ -1,13 +1,15 @@
 package com.help.stockassistplatform.domain.financial.service.impl;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.Objects;
 
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.context.event.EventListener;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,81 +49,86 @@ public class FinancialServiceImpl implements FinancialService {
 
 	private static final int PAGE_SIZE = 3;
 
+	private volatile boolean cacheInitialized = false;
+	private List<String> cachedTickerList;
+	private Map<String, StockPriceView> priceMap;
+	private Map<String, FinancialAnalysisView> analysisMap;
+	private Map<String, List<IncomeStatementView>> incomeMap;
+	private Map<String, List<BalanceSheetView>> balanceMap;
+	private Map<String, List<CashFlowView>> cashMap;
+	private Map<String, List<FinancialRatioView>> ratioMap;
+
+	@EventListener(ApplicationReadyEvent.class)
+	public void preloadCacheOnStartup() {
+		initializeStaticCache();
+		refreshPriceCache();
+		cacheInitialized = true;
+	}
+
+	@Scheduled(fixedDelay = 1000 * 60 * 2) // 2분마다 price 갱신
+	public void refreshPriceCache() {
+		if (cachedTickerList == null || cachedTickerList.isEmpty()) return;
+		this.priceMap = stockPriceViewRepository.findByTickerIn(cachedTickerList).stream()
+				.collect(Collectors.toMap(StockPriceView::getTicker, s -> s));
+	}
+
 	@Override
 	public FinancialDetailResponse getDetailByTicker(String ticker) {
 		StockPriceView price = stockPriceViewRepository.findOneByTicker(ticker)
-			.orElseThrow(() -> new CustomException(ErrorCode.TICKER_NOT_FOUND));
+				.orElseThrow(() -> new CustomException(ErrorCode.TICKER_NOT_FOUND));
 
 		String name = price.getName();
 		BigDecimal close = price.getPrice();
 		Float change = price.getChange();
 
 		Integer status = analysisRepository.findLatestByCompanyOrderByPostedAtDesc(ticker)
-			.map(FinancialAnalysisView::getAiAnalysis)
-			.orElse(null);
+				.map(FinancialAnalysisView::getAiAnalysis)
+				.orElse(null);
 
 		List<FinancialItemResponse> incomeList = FinancialMapper.mapIncome(
-			incomeRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
+				incomeRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
 		List<FinancialItemResponse> balanceList = FinancialMapper.mapBalance(
-			balanceRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
+				balanceRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
 		List<FinancialItemResponse> cashList = FinancialMapper.mapCash(
-			cashRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
+				cashRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
 		List<FinancialItemResponse> ratioList = FinancialMapper.mapRatio(
-			ratioRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
+				ratioRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
 
 		return FinancialDetailResponse.from(
-			name, ticker, close, change, status,
-			incomeList, balanceList, cashList, ratioList
+				name, ticker, close, change, status,
+				incomeList, balanceList, cashList, ratioList
 		);
 	}
 
 	@Override
 	public FinancialListResponse getListByPage(int page) {
+		if (!cacheInitialized) {
+			synchronized (this) {
+				if (!cacheInitialized) {
+					initializeStaticCache();
+					refreshPriceCache();
+					cacheInitialized = true;
+				}
+			}
+		}
+
 		int pageSize = PAGE_SIZE;
 		int offset = (page - 1) * pageSize;
 
-		// 1. 페이지에 해당하는 ticker 목록
-		List<String> tickers = stockPriceViewRepository.findPagedTickers(pageSize, offset);
-
-		if (tickers.isEmpty()) {
+		if (offset >= cachedTickerList.size()) {
 			throw new CustomException(ErrorCode.NOT_FOUND);
 		}
 
-		// 2. batch 조회
-		Map<String, StockPriceView> priceMap = stockPriceViewRepository.findByTickerIn(tickers).stream()
-				.collect(Collectors.toMap(StockPriceView::getTicker, s -> s));
+		List<String> tickers = cachedTickerList.subList(offset, Math.min(offset + pageSize, cachedTickerList.size()));
 
-		Map<String, FinancialAnalysisView> analysisMap = analysisRepository.findLatestByTickers(tickers).stream()
-				.collect(Collectors.toMap(FinancialAnalysisView::getCompany, a -> a));
-
-		Map<String, List<IncomeStatementView>> incomeMap = incomeRepository.findRecent2ByTickers(tickers).stream()
-				.collect(Collectors.groupingBy(IncomeStatementView::getCompany));
-
-		Map<String, List<BalanceSheetView>> balanceMap = balanceRepository.findRecent2ByTickers(tickers).stream()
-				.collect(Collectors.groupingBy(BalanceSheetView::getCompany));
-
-		Map<String, List<CashFlowView>> cashMap = cashRepository.findRecent2ByTickers(tickers).stream()
-				.collect(Collectors.groupingBy(CashFlowView::getCompany));
-
-		Map<String, List<FinancialRatioView>> ratioMap = ratioRepository.findRecent2ByTickers(tickers).stream()
-				.collect(Collectors.groupingBy(FinancialRatioView::getCompany));
-
-		// 3. 조립
 		List<FinancialDetailResponse> financials = tickers.stream()
 				.map(ticker -> {
 					StockPriceView stock = priceMap.get(ticker);
-					if (stock == null) return null;
-
-					if (!incomeMap.containsKey(ticker) || !balanceMap.containsKey(ticker)
-							|| !cashMap.containsKey(ticker) || !ratioMap.containsKey(ticker)) {
-						return null;
-					}
+					if (stock == null || !incomeMap.containsKey(ticker) || !balanceMap.containsKey(ticker)
+							|| !cashMap.containsKey(ticker) || !ratioMap.containsKey(ticker)) return null;
 
 					return FinancialDetailResponse.from(
-							stock.getName(),
-							ticker,
-							stock.getPrice(),
-							stock.getChange(),
+							stock.getName(), ticker, stock.getPrice(), stock.getChange(),
 							Optional.ofNullable(analysisMap.get(ticker)).map(FinancialAnalysisView::getAiAnalysis).orElse(null),
 							FinancialMapper.mapIncome(incomeMap.get(ticker)),
 							FinancialMapper.mapBalance(balanceMap.get(ticker)),
@@ -132,12 +139,31 @@ public class FinancialServiceImpl implements FinancialService {
 				.filter(Objects::nonNull)
 				.toList();
 
-		boolean hasNext = financials.size() == pageSize;
+		boolean hasNext = offset + pageSize < cachedTickerList.size();
 
 		if (financials.isEmpty()) {
 			throw new CustomException(ErrorCode.NOT_FOUND);
 		}
 
 		return FinancialListResponse.from(financials, page, hasNext);
+	}
+
+	private void initializeStaticCache() {
+		this.cachedTickerList = stockPriceViewRepository.findAllTickersSorted();
+
+		this.analysisMap = analysisRepository.findLatestByTickers(cachedTickerList).stream()
+				.collect(Collectors.toMap(FinancialAnalysisView::getCompany, a -> a));
+
+		this.incomeMap = incomeRepository.findRecent2ByTickers(cachedTickerList).stream()
+				.collect(Collectors.groupingBy(IncomeStatementView::getCompany));
+
+		this.balanceMap = balanceRepository.findRecent2ByTickers(cachedTickerList).stream()
+				.collect(Collectors.groupingBy(BalanceSheetView::getCompany));
+
+		this.cashMap = cashRepository.findRecent2ByTickers(cachedTickerList).stream()
+				.collect(Collectors.groupingBy(CashFlowView::getCompany));
+
+		this.ratioMap = ratioRepository.findRecent2ByTickers(cachedTickerList).stream()
+				.collect(Collectors.groupingBy(FinancialRatioView::getCompany));
 	}
 }

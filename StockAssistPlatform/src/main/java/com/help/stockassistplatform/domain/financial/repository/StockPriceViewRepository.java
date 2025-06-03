@@ -24,6 +24,13 @@ public interface StockPriceViewRepository extends JpaRepository<StockPriceView, 
 	List<String> findPagedTickers(@Param("limit") int limit, @Param("offset") int offset);
 
 	@Query(value = """
+		SELECT sp.ticker
+		FROM stock_vw sp
+		ORDER BY sp.market_cap DESC
+	""", nativeQuery = true)
+	List<String> findAllTickersSorted();
+
+	@Query(value = """
 			SELECT s.ticker, s.name_kr
 			FROM stock_vw s
 			WHERE CHAR_LENGTH(s.name_kr) <= 15
