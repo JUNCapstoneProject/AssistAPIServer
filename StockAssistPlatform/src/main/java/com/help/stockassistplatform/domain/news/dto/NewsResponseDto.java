@@ -13,7 +13,7 @@ import lombok.Getter;
 
 @Getter
 public class NewsResponseDto {
-	private String category;
+	private List<CategoryStatusDto> categories;
 	private String title;
 	private String description;
 	private String source;
@@ -23,7 +23,13 @@ public class NewsResponseDto {
 
 	public static NewsResponseDto from(final NewsView newsView) {
 		final NewsResponseDto dto = new NewsResponseDto();
-		dto.category = newsView.getTag();
+		dto.categories = List.of(
+				new CategoryStatusDto(
+						newsView.getTag(),
+						toSentimentLabel(newsView.getAiAnalysis()),
+						newsView.getAiAnalysis()
+				)
+		);
 		dto.title = newsView.getTranslatedTitle();
 		dto.description = summarize(newsView.getContent(), 100);
 		dto.source = newsView.getOrganization();
