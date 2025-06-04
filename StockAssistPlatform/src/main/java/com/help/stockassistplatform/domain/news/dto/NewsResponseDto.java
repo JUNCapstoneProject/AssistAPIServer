@@ -23,7 +23,7 @@ public class NewsResponseDto {
 	public static NewsResponseDto from(final NewsView newsView) {
 		final NewsResponseDto dto = new NewsResponseDto();
 		dto.categories = parseCategories(newsView.getTagsWithAnalysis());
-		dto.title = newsView.getTitle();
+		dto.title = newsView.getTranslatedTitle();
 		dto.description = summarize(newsView.getContent(), 100);
 		dto.source = newsView.getOrganization();
 		dto.date = formatDate(newsView.getPostedAt());
@@ -35,7 +35,7 @@ public class NewsResponseDto {
 		if (null == tagsWithAnalysis || tagsWithAnalysis.isBlank()) {
 			return Collections.emptyList();
 		}
-		
+
 		return Arrays.stream(tagsWithAnalysis.split(","))
 			.map(String::trim)
 			.filter(entry -> entry.contains(":"))

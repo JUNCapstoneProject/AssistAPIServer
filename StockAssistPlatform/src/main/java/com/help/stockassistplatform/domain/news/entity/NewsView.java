@@ -28,6 +28,9 @@ public class NewsView {
 	@Column(name = "title")
 	private String title;
 
+	@Column(name = "transed_title")
+	private String translatedTitle;
+
 	@Column(name = "hits")
 	private Long hits;
 
