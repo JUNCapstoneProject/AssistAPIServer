@@ -19,6 +19,7 @@ public class NewsResponseDto {
 	private String source;
 	private String date;
 	private String link;
+	private String aiAnalysis;
 
 	public static NewsResponseDto from(final NewsView newsView) {
 		final NewsResponseDto dto = new NewsResponseDto();
@@ -34,6 +35,7 @@ public class NewsResponseDto {
 		dto.source = newsView.getOrganization();
 		dto.date = formatDate(newsView.getPostedAt());
 		dto.link = newsView.getUrl();
+		dto.aiAnalysis = toSentimentLabel(newsView.getAiAnalysis());
 		return dto;
 	}
 
