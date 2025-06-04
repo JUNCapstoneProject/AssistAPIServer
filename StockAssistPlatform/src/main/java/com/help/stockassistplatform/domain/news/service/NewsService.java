@@ -4,6 +4,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import com.help.stockassistplatform.domain.news.dto.NewsResponseDto;
 import com.help.stockassistplatform.domain.news.entity.NewsView;
@@ -22,12 +24,17 @@ public class NewsService {
 	public Slice<NewsResponseDto> getNews(final String tag, final Pageable pageable) {
 		final Slice<NewsView> slice;
 
-		if (null == tag || tag.isBlank()) {
-			slice = newsRepository.findAllBy(pageable);
-		} else {
-			slice = newsRepository.findByTag(tag, pageable);
-		}
+		final Pageable fixedSort = PageRequest.of(
+				pageable.getPageNumber(),
+				pageable.getPageSize(),
+				Sort.by(Sort.Direction.DESC, "postedAt").and(Sort.by(Sort.Direction.DESC, "id"))
+		);
 
+		if (null == tag || tag.isBlank()) {
+			slice = newsRepository.findAllBy(fixedSort);
+		} else {
+			slice = newsRepository.findByTag(tag, fixedSort);
+		}
 		if (slice.isEmpty())
 			throw new NewsNotFoundException("뉴스 결과가 존재하지 않습니다.");
 
