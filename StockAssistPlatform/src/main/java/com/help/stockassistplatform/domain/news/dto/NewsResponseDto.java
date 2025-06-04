@@ -3,7 +3,6 @@ package com.help.stockassistplatform.domain.news.dto;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -31,23 +30,42 @@ public class NewsResponseDto {
 		return dto;
 	}
 
-	private static List<CategoryStatusDto> parseCategories(final String tagsWithAnalysis) {
-		if (null == tagsWithAnalysis || tagsWithAnalysis.isBlank()) {
-			return Collections.emptyList();
-		}
+	private static List<CategoryStatusDto> parseCategories(final String raw) {
+		if (raw == null || raw.isBlank())
+			return List.of();
 
-		return Arrays.stream(tagsWithAnalysis.split(","))
+		return Arrays.stream(raw.split(","))
 			.map(String::trim)
-			.filter(entry -> entry.contains(":"))
+			.filter(s -> s.contains(":"))
 			.map(NewsResponseDto::toCategoryStatusDto)
 			.toList();
 	}
 
-	private static CategoryStatusDto toCategoryStatusDto(final String entry) {
-		final String[] parts = entry.split(":", 2);
-		final String name = parts[0];
-		final String status = (parts.length > 1 && !parts[1].isBlank()) ? parts[1] : "분석 결과 없음";
-		return new CategoryStatusDto(name, status);
+	private static CategoryStatusDto toCategoryStatusDto(final String piece) {
+		final String[] parts = piece.split(":", 2);
+		final String ticker = parts[0].trim();
+		final Integer score = parseScore(parts.length > 1 ? parts[1] : null);
+		final String sentiment = toSentimentLabel(score);
+		return new CategoryStatusDto(ticker, sentiment, score);
+	}
+
+	private static Integer parseScore(String num) {
+		if (num == null || num.isBlank())
+			return null;
+		try {
+			return Integer.valueOf(num.trim());
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
+
+	private static String toSentimentLabel(Integer score) {
+		return switch (score) {
+			case 2 -> "긍정";
+			case 1 -> "중립";
+			case 0 -> "부정";
+			default -> "분석 결과 없음";
+		};
 	}
 
 	private static String formatDate(final LocalDateTime dateTime) {
