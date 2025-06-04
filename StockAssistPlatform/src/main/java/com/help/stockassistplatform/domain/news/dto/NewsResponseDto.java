@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 
 import com.help.stockassistplatform.domain.news.entity.NewsView;
 
@@ -38,13 +39,17 @@ public class NewsResponseDto {
 			.map(String::trim)
 			.filter(s -> s.contains(":"))
 			.map(NewsResponseDto::toCategoryStatusDto)
+			.filter(Objects::nonNull)
 			.toList();
 	}
 
 	private static CategoryStatusDto toCategoryStatusDto(final String piece) {
 		final String[] parts = piece.split(":", 2);
 		final String ticker = parts[0].trim();
-		final Integer score = parseScore(parts.length > 1 ? parts[1] : null);
+		if (ticker.isBlank())
+			return null;
+
+		final Integer score = (parts.length > 1) ? parseScore(parts[1]) : null;
 		final String sentiment = toSentimentLabel(score);
 		return new CategoryStatusDto(ticker, sentiment, score);
 	}
@@ -60,6 +65,8 @@ public class NewsResponseDto {
 	}
 
 	private static String toSentimentLabel(Integer score) {
+		if (null == score)
+			return "분석 결과 없음";
 		return switch (score) {
 			case 2 -> "긍정";
 			case 1 -> "중립";
