@@ -11,8 +11,7 @@ import com.help.stockassistplatform.domain.news.entity.NewsView;
 
 @Repository
 public interface NewsRepository extends JpaRepository<NewsView, String> {
-	@Query("SELECT n FROM NewsView n WHERE n.tagsWithAnalysis LIKE CONCAT('%', :tag, ':%')")
-	Slice<NewsView> findByTagInTagsWithAnalysis(@Param("tag") String tag, Pageable pageable);
+	Slice<NewsView> findByTag(String tag, Pageable pageable);
 
 	Slice<NewsView> findAllBy(Pageable pageable);
 }
