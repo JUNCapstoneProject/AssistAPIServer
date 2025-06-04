@@ -19,8 +19,7 @@ public class EmailVerificationService {
 	private final EmailContentProvider emailContentProvider;
 
 	public void sendVerificationEmail(final String token, final String email) {
-		// TODO: 인증 링크 프론트엔드 주소로 변경
-		final String verificationLink = "http://localhost:5173/verify?token=" + token;
+		final String verificationLink = "https://www.tuzain.com/verify?token=" + token;
 		try {
 			final MimeMessage message = mailSender.createMimeMessage();
 			final MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -37,8 +36,7 @@ public class EmailVerificationService {
 	}
 
 	public void sendPasswordResetEmail(final String token, final String email) {
-		// TODO: 프론트엔드 비밀번호 재설정 주소로 변경
-		final String resetLink = "http://localhost:5173/reset-password?token=" + token;
+		final String resetLink = "https://www.tuzain.com/reset-password?token=" + token;
 
 		try {
 			final MimeMessage message = mailSender.createMimeMessage();
