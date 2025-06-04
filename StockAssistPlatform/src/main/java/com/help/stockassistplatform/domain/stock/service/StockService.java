@@ -28,18 +28,38 @@ public class StockService {
 	private final AiAnalysisOrchestrator aiAnalysisOrchestrator;
 	private final StockPriceViewRepository stockPriceViewRepository;
 
-	public List<StockSearchResponse> search(final String query) {
-		final List<CompanyIndexed> result;
+	// public List<StockSearchResponse> search(final String query) {
+	// 	final List<CompanyIndexed> result;
+	//
+	// 	if (2 >= query.length()) {
+	// 		final String booleanQuery = query + "*";
+	// 		result = companyViewRepository.relevanceSearch(booleanQuery);
+	// 	} else {
+	// 		result = companyViewRepository.relevanceSearch(query);
+	// 	}
+	//
+	// 	return result
+	// 		.stream()
+	// 		.map(StockSearchResponse::from)
+	// 		.toList();
+	// }
 
-		if (2 >= query.length()) {
-			final String booleanQuery = query + "*";
-			result = companyViewRepository.prefixSearch(booleanQuery);
-		} else {
-			result = companyViewRepository.relevanceSearch(query);
+	public List<StockSearchResponse> search(String raw) {
+		final String q = raw.trim();
+		if (q.isBlank())
+			return List.of();
+
+		List<CompanyIndexed> hits =
+			(q.length() <= 2)
+				? companyViewRepository.prefixSearch(q, q.toUpperCase())
+				: companyViewRepository.fulltextSearch(q + "*", q.toUpperCase());
+
+		// FULLTEXT가 결과를 못 주는 예외 케이스 보완
+		if (hits.isEmpty()) {
+			hits = companyViewRepository.prefixSearch(q, q.toUpperCase());
 		}
 
-		return result
-			.stream()
+		return hits.stream()
 			.map(StockSearchResponse::from)
 			.toList();
 	}
