@@ -27,7 +27,7 @@ public record ReportResponse(
 			null,
 			Optional.ofNullable(report.getTag()).orElse("기타"),
 			report.getAuthor(),
-			report.getTitle(),
+			report.getTransedTitle(),
 			summarize(report.getContent()),
 			formatDate(report.getDate()),
 			report.getLink()
