@@ -70,6 +70,7 @@ public class AuthController {
 	@PostMapping("/password-reset-request")
 	public ApiResponse<?> requestPasswordReset(@Valid @RequestBody final PasswordResetRequestDto resetRequestDto) {
 		final String email = resetRequestDto.email();
+		log.info("Password reset requested for email: {}", email);
 
 		final String token = tokenService.createToken();
 		tokenService.saveResetEmailToRedis(token, email);
