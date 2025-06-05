@@ -148,6 +148,7 @@ public class FinancialServiceImpl implements FinancialService {
 		return FinancialListResponse.from(financials, page, hasNext);
 	}
 
+	@Scheduled(fixedDelay = 1000 * 60 * 60 * 2) // 2시간 마다 갱신
 	private void initializeStaticCache() {
 		this.cachedTickerList = stockPriceViewRepository.findAllTickersSorted();
 
