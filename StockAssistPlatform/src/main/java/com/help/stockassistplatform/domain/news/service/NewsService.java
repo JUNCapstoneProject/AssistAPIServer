@@ -1,13 +1,17 @@
 package com.help.stockassistplatform.domain.news.service;
 
+import static org.springframework.data.domain.Sort.Direction.*;
+
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.util.StringUtils;
 
 import com.help.stockassistplatform.domain.news.dto.NewsResponseDto;
+import com.help.stockassistplatform.domain.news.entity.Lang;
 import com.help.stockassistplatform.domain.news.entity.NewsView;
 import com.help.stockassistplatform.domain.news.exception.NewsNotFoundException;
 import com.help.stockassistplatform.domain.news.repository.NewsRepository;
@@ -21,23 +25,19 @@ public class NewsService {
 
 	private final NewsRepository newsRepository;
 
-	public Slice<NewsResponseDto> getNews(final String tag, final Pageable pageable) {
-		final Slice<NewsView> slice;
+	public Slice<NewsResponseDto> getNews(final String tag, final Pageable pageable, final Lang lang) {
+		final Pageable fixed = PageRequest.of(
+			pageable.getPageNumber(),
+			pageable.getPageSize(),
+			Sort.by(DESC, "postedAt").and(Sort.by(DESC, "id")));
 
-		final Pageable fixedSort = PageRequest.of(
-				pageable.getPageNumber(),
-				pageable.getPageSize(),
-				Sort.by(Sort.Direction.DESC, "postedAt").and(Sort.by(Sort.Direction.DESC, "id"))
-		);
+		final Slice<NewsView> slice = (StringUtils.hasText(tag))
+			? newsRepository.findByTag(tag, fixed)
+			: newsRepository.findAllBy(fixed);
 
-		if (null == tag || tag.isBlank()) {
-			slice = newsRepository.findAllBy(fixedSort);
-		} else {
-			slice = newsRepository.findByTag(tag, fixedSort);
-		}
 		if (slice.isEmpty())
 			throw new NewsNotFoundException("뉴스 결과가 존재하지 않습니다.");
 
-		return slice.map(NewsResponseDto::from);
+		return slice.map(view -> NewsResponseDto.from(view, lang));
 	}
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.help.stockassistplatform.domain.news.dto.NewsResponseDto;
 import com.help.stockassistplatform.domain.news.dto.NewsSliceResponse;
+import com.help.stockassistplatform.domain.news.entity.Lang;
 import com.help.stockassistplatform.domain.news.service.NewsService;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
 
@@ -31,10 +32,11 @@ public class NewsController {
 	public ApiResponse<?> getNews(
 		@RequestParam(required = false) final String category,
 		@RequestParam(defaultValue = "1") @Min(1L) final int page,
-		@RequestParam(defaultValue = "6") @Min(1L) final int limit
+		@RequestParam(defaultValue = "6") @Min(1L) final int limit,
+		@RequestParam(defaultValue = "ko") final String lang
 	) {
 		final Pageable pageable = PageRequest.of(page - 1, limit, Sort.by(DESC, "postedAt"));
-		final Slice<NewsResponseDto> result = newsService.getNews(category, pageable);
+		final Slice<NewsResponseDto> result = newsService.getNews(category, pageable, Lang.of(lang));
 		return ApiResponse.success(NewsSliceResponse.from(result));
 	}
 }
