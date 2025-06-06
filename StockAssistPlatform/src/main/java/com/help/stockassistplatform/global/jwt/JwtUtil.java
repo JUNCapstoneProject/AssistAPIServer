@@ -90,7 +90,9 @@ public class JwtUtil {
 		return ResponseCookie.from(REFRESH_TOKEN, refreshToken)
 			.httpOnly(true)
 			.secure(true)
+			.sameSite("None")
 			.path("/")
+			.domain(".tuzain.com")
 			.maxAge(REFRESH_TOKEN_EXP / 1000L)
 			.build();
 	}
