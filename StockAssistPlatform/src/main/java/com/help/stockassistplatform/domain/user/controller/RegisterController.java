@@ -6,25 +6,28 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.help.stockassistplatform.domain.user.dto.request.SignupRequestDto;
 import com.help.stockassistplatform.domain.user.service.EmailVerificationService;
 import com.help.stockassistplatform.domain.user.service.UserService;
 import com.help.stockassistplatform.domain.user.service.VerificationTokenService;
+import com.help.stockassistplatform.global.common.VerificationBaseUrlResolver;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
+@Slf4j
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class RegisterController {
 	private final UserService userService;
 	private final VerificationTokenService verificationTokenService;
 	private final EmailVerificationService emailVerificationService;
+	private final VerificationBaseUrlResolver verificationBaseUrlResolver;
 
 	// 회원가입 요청
 	@PostMapping("/register")
@@ -35,10 +38,8 @@ public class RegisterController {
 		final String token = verificationTokenService.createToken();
 		verificationTokenService.saveUserInfoToRedis(token, request);
 
-		final String baseUrl = ServletUriComponentsBuilder.fromRequestUri(httpRequest)
-			.replacePath(null)
-			.build()
-			.toUriString();
+		final String baseUrl = verificationBaseUrlResolver.resolve(httpRequest);
+		log.info("Base URL for email verification: {}", baseUrl);
 
 		emailVerificationService.sendVerificationEmail(token, request.getEmail(), baseUrl);
 		return ApiResponse.success(null);
