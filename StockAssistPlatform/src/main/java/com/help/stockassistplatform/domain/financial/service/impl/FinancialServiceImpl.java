@@ -3,13 +3,13 @@ package com.help.stockassistplatform.domain.financial.service.impl;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.Objects;
 
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.context.event.EventListener;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,36 +67,37 @@ public class FinancialServiceImpl implements FinancialService {
 
 	@Scheduled(fixedDelay = 1000 * 60 * 2) // 2분마다 price 갱신
 	public void refreshPriceCache() {
-		if (cachedTickerList == null || cachedTickerList.isEmpty()) return;
+		if (cachedTickerList == null || cachedTickerList.isEmpty())
+			return;
 		this.priceMap = stockPriceViewRepository.findByTickerIn(cachedTickerList).stream()
-				.collect(Collectors.toMap(StockPriceView::getTicker, s -> s));
+			.collect(Collectors.toMap(StockPriceView::getTicker, s -> s));
 	}
 
 	@Override
 	public FinancialDetailResponse getDetailByTicker(String ticker) {
 		StockPriceView price = stockPriceViewRepository.findOneByTicker(ticker)
-				.orElseThrow(() -> new CustomException(ErrorCode.TICKER_NOT_FOUND));
+			.orElseThrow(() -> new CustomException(ErrorCode.TICKER_NOT_FOUND));
 
 		String name = price.getName();
 		BigDecimal close = price.getPrice();
 		Float change = price.getChange();
 
 		Integer status = analysisRepository.findLatestByCompanyOrderByPostedAtDesc(ticker)
-				.map(FinancialAnalysisView::getAiAnalysis)
-				.orElse(null);
+			.map(FinancialAnalysisView::getAiAnalysis)
+			.orElse(null);
 
 		List<FinancialItemResponse> incomeList = FinancialMapper.mapIncome(
-				incomeRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
+			incomeRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
 		List<FinancialItemResponse> balanceList = FinancialMapper.mapBalance(
-				balanceRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
+			balanceRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
 		List<FinancialItemResponse> cashList = FinancialMapper.mapCash(
-				cashRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
+			cashRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
 		List<FinancialItemResponse> ratioList = FinancialMapper.mapRatio(
-				ratioRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
+			ratioRepository.findRecent2ByCompanyOrderByPostedAtDesc(ticker));
 
 		return FinancialDetailResponse.from(
-				name, ticker, close, change, status,
-				incomeList, balanceList, cashList, ratioList
+			name, ticker, close, change, status,
+			incomeList, balanceList, cashList, ratioList
 		);
 	}
 
@@ -122,22 +123,23 @@ public class FinancialServiceImpl implements FinancialService {
 		List<String> tickers = cachedTickerList.subList(offset, Math.min(offset + pageSize, cachedTickerList.size()));
 
 		List<FinancialDetailResponse> financials = tickers.stream()
-				.map(ticker -> {
-					StockPriceView stock = priceMap.get(ticker);
-					if (stock == null || !incomeMap.containsKey(ticker) || !balanceMap.containsKey(ticker)
-							|| !cashMap.containsKey(ticker) || !ratioMap.containsKey(ticker)) return null;
+			.map(ticker -> {
+				StockPriceView stock = priceMap.get(ticker);
+				if (stock == null || !incomeMap.containsKey(ticker) || !balanceMap.containsKey(ticker)
+					|| !cashMap.containsKey(ticker) || !ratioMap.containsKey(ticker))
+					return null;
 
-					return FinancialDetailResponse.from(
-							stock.getName(), ticker, stock.getPrice(), stock.getChange(),
-							Optional.ofNullable(analysisMap.get(ticker)).map(FinancialAnalysisView::getAiAnalysis).orElse(null),
-							FinancialMapper.mapIncome(incomeMap.get(ticker)),
-							FinancialMapper.mapBalance(balanceMap.get(ticker)),
-							FinancialMapper.mapCash(cashMap.get(ticker)),
-							FinancialMapper.mapRatio(ratioMap.get(ticker))
-					);
-				})
-				.filter(Objects::nonNull)
-				.toList();
+				return FinancialDetailResponse.from(
+					stock.getName(), ticker, stock.getPrice(), stock.getChange(),
+					Optional.ofNullable(analysisMap.get(ticker)).map(FinancialAnalysisView::getAiAnalysis).orElse(null),
+					FinancialMapper.mapIncome(incomeMap.get(ticker)),
+					FinancialMapper.mapBalance(balanceMap.get(ticker)),
+					FinancialMapper.mapCash(cashMap.get(ticker)),
+					FinancialMapper.mapRatio(ratioMap.get(ticker))
+				);
+			})
+			.filter(Objects::nonNull)
+			.toList();
 
 		boolean hasNext = offset + pageSize < cachedTickerList.size();
 
@@ -149,22 +151,22 @@ public class FinancialServiceImpl implements FinancialService {
 	}
 
 	@Scheduled(fixedDelay = 1000 * 60 * 60 * 2) // 2시간 마다 갱신
-	private void initializeStaticCache() {
+	protected void initializeStaticCache() {
 		this.cachedTickerList = stockPriceViewRepository.findAllTickersSorted();
 
 		this.analysisMap = analysisRepository.findLatestByTickers(cachedTickerList).stream()
-				.collect(Collectors.toMap(FinancialAnalysisView::getCompany, a -> a));
+			.collect(Collectors.toMap(FinancialAnalysisView::getCompany, a -> a));
 
 		this.incomeMap = incomeRepository.findRecent2ByTickers(cachedTickerList).stream()
-				.collect(Collectors.groupingBy(IncomeStatementView::getCompany));
+			.collect(Collectors.groupingBy(IncomeStatementView::getCompany));
 
 		this.balanceMap = balanceRepository.findRecent2ByTickers(cachedTickerList).stream()
-				.collect(Collectors.groupingBy(BalanceSheetView::getCompany));
+			.collect(Collectors.groupingBy(BalanceSheetView::getCompany));
 
 		this.cashMap = cashRepository.findRecent2ByTickers(cachedTickerList).stream()
-				.collect(Collectors.groupingBy(CashFlowView::getCompany));
+			.collect(Collectors.groupingBy(CashFlowView::getCompany));
 
 		this.ratioMap = ratioRepository.findRecent2ByTickers(cachedTickerList).stream()
-				.collect(Collectors.groupingBy(FinancialRatioView::getCompany));
+			.collect(Collectors.groupingBy(FinancialRatioView::getCompany));
 	}
 }
