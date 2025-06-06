@@ -5,6 +5,8 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.help.stockassistplatform.global.common.VerificationLinkBuilder;
+
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 public class EmailVerificationService {
 	private final JavaMailSender mailSender;
 	private final EmailContentProvider emailContentProvider;
+	private final VerificationLinkBuilder linkBuilder;
 
-	public void sendVerificationEmail(final String token, final String email) {
-		final String verificationLink = "https://www.tuzain.com/verify?token=" + token;
+	public void sendVerificationEmail(final String token, final String email, final String baseUrl) {
+		final String verificationLink = linkBuilder.registerUriBuild(baseUrl, token);
+
 		try {
 			final MimeMessage message = mailSender.createMimeMessage();
 			final MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -35,8 +39,8 @@ public class EmailVerificationService {
 		}
 	}
 
-	public void sendPasswordResetEmail(final String token, final String email) {
-		final String resetLink = "https://www.tuzain.com/reset-password?token=" + token;
+	public void sendPasswordResetEmail(final String token, final String email, final String baseUrl) {
+		final String resetLink = linkBuilder.passwordResetUriBuild(baseUrl, token);
 
 		try {
 			final MimeMessage message = mailSender.createMimeMessage();
