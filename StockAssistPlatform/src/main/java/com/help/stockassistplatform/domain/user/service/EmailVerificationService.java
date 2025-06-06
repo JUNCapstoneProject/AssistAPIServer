@@ -22,8 +22,8 @@ public class EmailVerificationService {
 	private final VerificationLinkBuilder linkBuilder;
 
 	public void sendVerificationEmail(final String token, final String email, final String baseUrl) {
-		final String verificationLink = linkBuilder.build(baseUrl, token);
-		
+		final String verificationLink = linkBuilder.registerUriBuild(baseUrl, token);
+
 		try {
 			final MimeMessage message = mailSender.createMimeMessage();
 			final MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
@@ -39,8 +39,8 @@ public class EmailVerificationService {
 		}
 	}
 
-	public void sendPasswordResetEmail(final String token, final String email) {
-		final String resetLink = "https://www.tuzain.com/reset-password?token=" + token;
+	public void sendPasswordResetEmail(final String token, final String email, final String baseUrl) {
+		final String resetLink = linkBuilder.passwordResetUriBuild(baseUrl, token);
 
 		try {
 			final MimeMessage message = mailSender.createMimeMessage();

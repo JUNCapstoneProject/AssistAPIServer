@@ -6,9 +6,17 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Component
 public class VerificationLinkBuilder {
 
-	public String build(final String baseUrl, final String token) {
+	public String registerUriBuild(final String baseUrl, final String token) {
 		return UriComponentsBuilder.fromUriString(baseUrl)
 			.path("/verify")
+			.queryParam("token", token)
+			.build()
+			.toUriString();
+	}
+
+	public String passwordResetUriBuild(final String baseUrl, final String token) {
+		return UriComponentsBuilder.fromUriString(baseUrl)
+			.path("/reset-password")
 			.queryParam("token", token)
 			.build()
 			.toUriString();

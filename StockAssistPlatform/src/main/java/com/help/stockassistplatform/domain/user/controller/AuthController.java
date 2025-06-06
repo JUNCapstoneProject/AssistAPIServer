@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.help.stockassistplatform.domain.user.dto.request.LoginRequestDto;
 import com.help.stockassistplatform.domain.user.dto.request.PasswordResetConfirmDto;
@@ -68,13 +69,19 @@ public class AuthController {
 	}
 
 	@PostMapping("/password-reset-request")
-	public ApiResponse<?> requestPasswordReset(@Valid @RequestBody final PasswordResetRequestDto resetRequestDto) {
+	public ApiResponse<?> requestPasswordReset(@Valid @RequestBody final PasswordResetRequestDto resetRequestDto,
+		HttpServletRequest httpRequest) {
 		final String email = resetRequestDto.email();
 		log.info("Password reset requested for email: {}", email);
 
+		final String baseUrl = ServletUriComponentsBuilder.fromRequestUri(httpRequest)
+			.replacePath(null)
+			.build()
+			.toUriString();
+
 		final String token = tokenService.createToken();
 		tokenService.saveResetEmailToRedis(token, email);
-		emailService.sendPasswordResetEmail(token, email);
+		emailService.sendPasswordResetEmail(token, email, baseUrl);
 		return ApiResponse.success(null);
 	}
 
