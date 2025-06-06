@@ -31,7 +31,7 @@ public class NewsController {
 
 	@GetMapping("/news")
 	public ApiResponse<?> getNews(
-		@RequestParam(required = false) final String category,
+                @RequestParam(required = false) final List<String> category,
 		@RequestParam(required = false) final String sentiment,
 		@RequestParam(defaultValue = "1") @Min(1L) final int page,
 		@RequestParam(defaultValue = "6") @Min(1L) final int limit,
