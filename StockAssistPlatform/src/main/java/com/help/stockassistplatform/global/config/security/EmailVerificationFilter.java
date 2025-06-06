@@ -29,7 +29,8 @@ public class EmailVerificationFilter extends OncePerRequestFilter {
 		"https://mail.naver.com",
 		"https://outlook.live.com",
 		"http://localhost:5173",
-		"https://www.tuzain.com/"
+		"https://www.tuzain.com/",
+		"https://developer.tuzain.com/"
 	);
 
 	private final ObjectMapper objectMapper;
