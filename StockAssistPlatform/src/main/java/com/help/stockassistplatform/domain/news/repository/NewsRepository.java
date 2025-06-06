@@ -17,5 +17,5 @@ public interface NewsRepository extends JpaRepository<NewsView, String> {
 
 	Slice<NewsView> findByAiAnalysis(Integer aiAnalysis, Pageable pageable);
 
-	Slice<NewsView> findByTagAndAiAnalysis(String tag, Integer aiAnalysis, Pageable pageable);
+	Slice<NewsView> findByTagInAndAiAnalysis(List<String> tags, Integer aiAnalysis, Pageable pageable);
 }
