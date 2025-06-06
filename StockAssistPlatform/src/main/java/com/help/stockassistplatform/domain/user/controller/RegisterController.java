@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.help.stockassistplatform.domain.user.dto.request.SignupRequestDto;
 import com.help.stockassistplatform.domain.user.service.EmailVerificationService;
@@ -13,6 +14,7 @@ import com.help.stockassistplatform.domain.user.service.UserService;
 import com.help.stockassistplatform.domain.user.service.VerificationTokenService;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -26,11 +28,19 @@ public class RegisterController {
 
 	// 회원가입 요청
 	@PostMapping("/register")
-	public ApiResponse<?> signup(@Valid @RequestBody final SignupRequestDto request) {
+	public ApiResponse<?> signup(@Valid @RequestBody final SignupRequestDto request,
+		final HttpServletRequest httpRequest) {
 		userService.validateDuplicateEmail(request.getEmail());
+
 		final String token = verificationTokenService.createToken();
 		verificationTokenService.saveUserInfoToRedis(token, request);
-		emailVerificationService.sendVerificationEmail(token, request.getEmail());
+
+		final String baseUrl = ServletUriComponentsBuilder.fromRequestUri(httpRequest)
+			.replacePath(null)
+			.build()
+			.toUriString();
+
+		emailVerificationService.sendVerificationEmail(token, request.getEmail(), baseUrl);
 		return ApiResponse.success(null);
 	}
 
