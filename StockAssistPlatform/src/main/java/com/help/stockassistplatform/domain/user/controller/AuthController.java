@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.help.stockassistplatform.domain.user.dto.request.LoginRequestDto;
 import com.help.stockassistplatform.domain.user.dto.request.PasswordResetConfirmDto;
@@ -16,6 +15,7 @@ import com.help.stockassistplatform.domain.user.service.AuthService;
 import com.help.stockassistplatform.domain.user.service.EmailVerificationService;
 import com.help.stockassistplatform.domain.user.service.UserService;
 import com.help.stockassistplatform.domain.user.service.VerificationTokenService;
+import com.help.stockassistplatform.global.common.VerificationBaseUrlResolver;
 import com.help.stockassistplatform.global.common.response.ApiResponse;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +34,8 @@ public class AuthController {
 
 	private final VerificationTokenService tokenService;
 	private final EmailVerificationService emailService;
+
+	private final VerificationBaseUrlResolver verificationBaseUrlResolver;
 
 	// 로그인
 	@PostMapping("/login")
@@ -74,10 +76,8 @@ public class AuthController {
 		final String email = resetRequestDto.email();
 		log.info("Password reset requested for email: {}", email);
 
-		final String baseUrl = ServletUriComponentsBuilder.fromRequestUri(httpRequest)
-			.replacePath(null)
-			.build()
-			.toUriString();
+		final String baseUrl = verificationBaseUrlResolver.resolve(httpRequest);
+		log.info("Base URL for password reset email: {}", baseUrl);
 
 		final String token = tokenService.createToken();
 		tokenService.saveResetEmailToRedis(token, email);
