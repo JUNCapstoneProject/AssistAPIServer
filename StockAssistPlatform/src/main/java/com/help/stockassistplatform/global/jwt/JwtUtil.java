@@ -122,7 +122,9 @@ public class JwtUtil {
 		return ResponseCookie.from(REFRESH_TOKEN, "")
 			.httpOnly(true)
 			.secure(true)
+			.sameSite("None")
 			.path("/")
+			.domain(".tuzain.com")
 			.maxAge(0L) // 쿠키 즉시 만료
 			.build();
 	}
