@@ -2,16 +2,18 @@ package com.help.stockassistplatform.domain.news.dto;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
+import java.util.Optional;
 
+import com.help.stockassistplatform.domain.news.entity.Lang;
 import com.help.stockassistplatform.domain.news.entity.NewsView;
 
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public class NewsResponseDto {
 	private List<CategoryStatusDto> categories;
 	private String title;
@@ -19,24 +21,27 @@ public class NewsResponseDto {
 	private String source;
 	private String date;
 	private String link;
-	private String aiAnalysis;
 
-	public static NewsResponseDto from(final NewsView newsView) {
-		final NewsResponseDto dto = new NewsResponseDto();
-		dto.categories = List.of(
-				new CategoryStatusDto(
-						newsView.getTag(),
-						toSentimentLabel(newsView.getAiAnalysis()),
-						newsView.getAiAnalysis()
-				)
-		);
-		dto.title = newsView.getTranslatedTitle();
-		dto.description = summarize(newsView.getContent(), 100);
-		dto.source = newsView.getOrganization();
-		dto.date = formatDate(newsView.getPostedAt());
-		dto.link = newsView.getUrl();
-		dto.aiAnalysis = toSentimentLabel(newsView.getAiAnalysis());
-		return dto;
+	public static NewsResponseDto from(final NewsView view, final Lang lang) {
+		return NewsResponseDto.builder()
+			.categories(List.of(new CategoryStatusDto(
+				view.getTag(),
+				toSentimentLabel(view.getAiAnalysis()),
+				view.getAiAnalysis())))
+			.title(resolveTitle(view, lang))
+			.description(summarize(view.getContent(), 100))
+			.source(view.getOrganization())
+			.date(formatDate(view.getPostedAt()))
+			.link(view.getUrl())
+			.build();
+	}
+
+	private static String resolveTitle(final NewsView view, final Lang lang) {
+		return switch (lang) {
+			case EN -> view.getTitle();
+			case KO -> Optional.ofNullable(view.getTranslatedTitle())
+				.orElse(view.getTitle());
+		};
 	}
 
 	private static String toSentimentLabel(Integer score) {
