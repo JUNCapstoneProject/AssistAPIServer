@@ -1,10 +1,7 @@
 package com.help.stockassistplatform.domain.financial.service.impl;
 
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -16,19 +13,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.help.stockassistplatform.domain.financial.dto.response.FinancialDetailResponse;
 import com.help.stockassistplatform.domain.financial.dto.response.FinancialItemResponse;
 import com.help.stockassistplatform.domain.financial.dto.response.FinancialListResponse;
-import com.help.stockassistplatform.domain.financial.entity.BalanceSheetView;
-import com.help.stockassistplatform.domain.financial.entity.CashFlowView;
-import com.help.stockassistplatform.domain.financial.entity.FinancialAnalysisView;
-import com.help.stockassistplatform.domain.financial.entity.FinancialRatioView;
-import com.help.stockassistplatform.domain.financial.entity.IncomeStatementView;
-import com.help.stockassistplatform.domain.financial.entity.StockPriceView;
+import com.help.stockassistplatform.domain.financial.entity.*;
 import com.help.stockassistplatform.domain.financial.mapper.FinancialMapper;
-import com.help.stockassistplatform.domain.financial.repository.BalanceSheetViewRepository;
-import com.help.stockassistplatform.domain.financial.repository.CashFlowViewRepository;
-import com.help.stockassistplatform.domain.financial.repository.FinancialAnalysisViewRepository;
-import com.help.stockassistplatform.domain.financial.repository.FinancialRatioViewRepository;
-import com.help.stockassistplatform.domain.financial.repository.IncomeStatementViewRepository;
-import com.help.stockassistplatform.domain.financial.repository.StockPriceViewRepository;
+import com.help.stockassistplatform.domain.financial.repository.*;
 import com.help.stockassistplatform.domain.financial.service.FinancialService;
 import com.help.stockassistplatform.global.common.exception.CustomException;
 import com.help.stockassistplatform.global.common.exception.ErrorCode;
@@ -67,8 +54,7 @@ public class FinancialServiceImpl implements FinancialService {
 
 	@Scheduled(fixedDelay = 1000 * 60 * 2) // 2분마다 price 갱신
 	public void refreshPriceCache() {
-		if (cachedTickerList == null || cachedTickerList.isEmpty())
-			return;
+		if (cachedTickerList == null || cachedTickerList.isEmpty()) return;
 		this.priceMap = stockPriceViewRepository.findByTickerIn(cachedTickerList).stream()
 			.collect(Collectors.toMap(StockPriceView::getTicker, s -> s));
 	}
@@ -123,21 +109,7 @@ public class FinancialServiceImpl implements FinancialService {
 		List<String> tickers = cachedTickerList.subList(offset, Math.min(offset + pageSize, cachedTickerList.size()));
 
 		List<FinancialDetailResponse> financials = tickers.stream()
-			.map(ticker -> {
-				StockPriceView stock = priceMap.get(ticker);
-				if (stock == null || !incomeMap.containsKey(ticker) || !balanceMap.containsKey(ticker)
-					|| !cashMap.containsKey(ticker) || !ratioMap.containsKey(ticker))
-					return null;
-
-				return FinancialDetailResponse.from(
-					stock.getName(), ticker, stock.getPrice(), stock.getChange(),
-					Optional.ofNullable(analysisMap.get(ticker)).map(FinancialAnalysisView::getAiAnalysis).orElse(null),
-					FinancialMapper.mapIncome(incomeMap.get(ticker)),
-					FinancialMapper.mapBalance(balanceMap.get(ticker)),
-					FinancialMapper.mapCash(cashMap.get(ticker)),
-					FinancialMapper.mapRatio(ratioMap.get(ticker))
-				);
-			})
+			.map(this::mapToDetail)
 			.filter(Objects::nonNull)
 			.toList();
 
@@ -150,7 +122,79 @@ public class FinancialServiceImpl implements FinancialService {
 		return FinancialListResponse.from(financials, page, hasNext);
 	}
 
-	@Scheduled(fixedDelay = 1000 * 60 * 60 * 2) // 2시간 마다 갱신
+	@Override
+	public FinancialListResponse getList(int page, int size, String sortBy, String sort, Integer sentiment) {
+		if (!cacheInitialized) {
+			synchronized (this) {
+				if (!cacheInitialized) {
+					initializeStaticCache();
+					refreshPriceCache();
+					cacheInitialized = true;
+				}
+			}
+		}
+
+		// 1. 감성 필터링
+		List<String> filteredTickers = cachedTickerList.stream()
+			.filter(ticker -> {
+				if (sentiment == null) return true;
+				FinancialAnalysisView analysis = analysisMap.get(ticker);
+				return analysis != null && sentiment.equals(analysis.getAiAnalysis());
+			})
+			.collect(Collectors.toList());
+
+		// 2. 정렬 기준 설정
+		Comparator<String> comparator = Comparator.comparing(ticker -> {
+			if ("revenue".equalsIgnoreCase(sortBy)) {
+				List<IncomeStatementView> incomeList = incomeMap.get(ticker);
+				return (incomeList != null && !incomeList.isEmpty()) ? incomeList.get(0).getTotalRevenue() : BigDecimal.ZERO;
+			}
+			StockPriceView price = priceMap.get(ticker);
+			return price != null ? price.getPrice() : BigDecimal.ZERO;
+		});
+
+		if ("desc".equalsIgnoreCase(sort)) {
+			comparator = comparator.reversed();
+		}
+		filteredTickers.sort(comparator);
+
+		// 3. 페이징 처리
+		int offset = (page - 1) * size;
+		int end = Math.min(offset + size, filteredTickers.size());
+
+		if (offset >= filteredTickers.size()) {
+			throw new CustomException(ErrorCode.NOT_FOUND);
+		}
+
+		List<String> pagedTickers = filteredTickers.subList(offset, end);
+
+		List<FinancialDetailResponse> financials = pagedTickers.stream()
+			.map(this::mapToDetail)
+			.filter(Objects::nonNull)
+			.toList();
+
+		boolean hasNext = end < filteredTickers.size();
+
+		return FinancialListResponse.from(financials, page, hasNext);
+	}
+
+	private FinancialDetailResponse mapToDetail(String ticker) {
+		StockPriceView stock = priceMap.get(ticker);
+		if (stock == null || !incomeMap.containsKey(ticker) || !balanceMap.containsKey(ticker)
+			|| !cashMap.containsKey(ticker) || !ratioMap.containsKey(ticker))
+			return null;
+
+		return FinancialDetailResponse.from(
+			stock.getName(), ticker, stock.getPrice(), stock.getChange(),
+			Optional.ofNullable(analysisMap.get(ticker)).map(FinancialAnalysisView::getAiAnalysis).orElse(null),
+			FinancialMapper.mapIncome(incomeMap.get(ticker)),
+			FinancialMapper.mapBalance(balanceMap.get(ticker)),
+			FinancialMapper.mapCash(cashMap.get(ticker)),
+			FinancialMapper.mapRatio(ratioMap.get(ticker))
+		);
+	}
+
+	@Scheduled(fixedDelay = 1000 * 60 * 60 * 2) // 2시간 마다 전체 재로딩
 	protected void initializeStaticCache() {
 		this.cachedTickerList = stockPriceViewRepository.findAllTickersSorted();
 
