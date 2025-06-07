@@ -27,7 +27,7 @@ public class JwtUtil {
 	private static final String ACCESS_HEADER = "Authorization";
 	private static final String ACCESS_TOKEN = "AccessToken";
 	private static final String TOKEN_PREFIX = "Bearer ";
-	private static final Long ACCESS_TOKEN_EXP = (long)(30 * 1000); // 2시간(2 * 60 * 60 * 1000)
+	private static final Long ACCESS_TOKEN_EXP = (long)(2 * 60 * 60 * 1000); // 2시간
 	private static final Long REFRESH_TOKEN_EXP = (long)(7 * 24 * 60 * 60 * 1000); // 7일
 	private static final String REFRESH_TOKEN = "RefreshToken";
 	private SecretKey secretKey;
