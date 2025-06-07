@@ -2,6 +2,7 @@ package com.help.stockassistplatform.domain.stock.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import com.help.stockassistplatform.domain.stock.dto.response.StockPriceTimeSeriesResponse;
 import com.help.stockassistplatform.domain.stock.dto.response.StockSummaryResponse;
@@ -28,5 +29,5 @@ public interface StockQueryService {
 	 */
 	StockPriceTimeSeriesResponse getPriceTimeSeries(String symbol, LocalDate start, LocalDate end, String period);
 
-	StockPriceInfoDto getSummary(String ticker);
+	Optional<StockPriceInfoDto> getSummary(String ticker);
 }

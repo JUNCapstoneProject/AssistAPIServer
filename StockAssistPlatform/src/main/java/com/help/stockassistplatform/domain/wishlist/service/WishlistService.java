@@ -1,6 +1,7 @@
 package com.help.stockassistplatform.domain.wishlist.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,11 +44,17 @@ public class WishlistService {
 		return wishlistRepository.findByIdUserIdOrderByIdTickerAsc(user.getUserId())
 			.stream()
 			.map(this::toDto)
+			.flatMap(Optional::stream)
 			.toList();
 	}
 
-	private WishlistItemDto toDto(final UserWishlist entity) {
-		var info = stockQueryService.getSummary(entity.getId().getTicker());
-		return new WishlistItemDto(info.ticker(), info.name(), info.price().toPlainString(), true);
+	private Optional<WishlistItemDto> toDto(final UserWishlist entity) {
+		return stockQueryService.getSummary(entity.getId().getTicker())
+			.map(info -> new WishlistItemDto(
+				info.ticker(),
+				info.name(),
+				info.price().toPlainString(),
+				true
+			));
 	}
 }
