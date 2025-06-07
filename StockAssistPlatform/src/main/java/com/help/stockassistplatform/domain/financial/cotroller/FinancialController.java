@@ -28,8 +28,8 @@ public class FinancialController {
             return ApiResponse.success(detail);
         }
 
-        // 전체 리스트 조회
-        FinancialListResponse list = financialService.getListByPage(page);
-        return ApiResponse.success(list);
+        // 전체 리스트 조회 (정렬/필터 적용)
+       FinancialListResponse list = financialService.getList(page, size, sortBy, sort, sentiment);
+       return ApiResponse.success(list);
     }
 }
