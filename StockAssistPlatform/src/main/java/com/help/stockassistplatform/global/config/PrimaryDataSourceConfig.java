@@ -30,7 +30,8 @@ import jakarta.persistence.EntityManagerFactory;
 	basePackages = {
 		"com.help.stockassistplatform.domain.user.repository",
 		"com.help.stockassistplatform.domain.report.user.repository",
-		"com.help.stockassistplatform.domain.stock.indexed.repository"
+		"com.help.stockassistplatform.domain.stock.indexed.repository",
+		"com.help.stockassistplatform.domain.wishlist.repository"
 	},
 	entityManagerFactoryRef = "primaryEntityManagerFactory",
 	transactionManagerRef = "primaryTransactionManager"
@@ -83,7 +84,8 @@ public class PrimaryDataSourceConfig {
 			.packages(
 				"com.help.stockassistplatform.domain.user.entity",
 				"com.help.stockassistplatform.domain.report.user.entity",
-				"com.help.stockassistplatform.domain.stock.indexed.entity"
+				"com.help.stockassistplatform.domain.stock.indexed.entity",
+				"com.help.stockassistplatform.domain.wishlist.entity"
 			)
 			.persistenceUnit("primary")
 			.properties(properties)
