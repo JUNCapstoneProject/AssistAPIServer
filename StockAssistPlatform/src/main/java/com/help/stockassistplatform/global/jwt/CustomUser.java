@@ -1,44 +1,37 @@
 package com.help.stockassistplatform.global.jwt;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
+
+import com.help.stockassistplatform.domain.user.entity.User;
 
 import lombok.Getter;
-import lombok.Setter;
 
-public class CustomUser extends User {
-	@Getter
-	@Setter
-	private UUID userId;
-	@Getter
-	@Setter
-	private String nickname;
+@Getter
+public class CustomUser extends org.springframework.security.core.userdetails.User {
+	private final User domainUser;
+	private final UUID userId;
+	private final String nickname;
 
-	public CustomUser(
+	private CustomUser(
 		String username,
 		String password,
-		Collection<? extends GrantedAuthority> authorities
+		Collection<? extends GrantedAuthority> authorities,
+		User domainUser
 	) {
 		super(username, password, authorities);
+		this.domainUser = domainUser;
+		this.userId = domainUser.getUserId();
+		this.nickname = domainUser.getUserProfile().getNickname();
 	}
 
-	public static CustomUser from(final com.help.stockassistplatform.domain.user.entity.User user) {
-		final List<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority(user.getRole().getRoleName()));
-		final CustomUser customUser = new CustomUser(
-			user.getUsername(),
-			user.getPassword(),
-			authorities
-		);
-		customUser.setUserId(user.getUserId());
-		customUser.setNickname(user.getUserProfile().getNickname());
-
-		return customUser;
+	public static CustomUser from(final User user) {
+		final List<GrantedAuthority> auth =
+			List.of(new SimpleGrantedAuthority(user.getRole().getRoleName()));
+		return new CustomUser(user.getUsername(), user.getPassword(), auth, user);
 	}
 }
