@@ -52,6 +52,11 @@ public class FinancialServiceImpl implements FinancialService {
         cacheInitialized = true;
     }
 
+     /**
+     * 주가 관련 데이터는 빈번히 변경되므로,
+     * 2분마다 최신 가격 정보를 조회하여 캐시에 갱신합니다.
+     */
+    
     @Scheduled(fixedDelay = 1000 * 60 * 2)
     public void refreshPriceCache() {
         if (cachedTickerList == null || cachedTickerList.isEmpty()) return;
