@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ import com.help.stockassistplatform.domain.stock.dto.response.StockPriceTimeSeri
 import com.help.stockassistplatform.domain.stock.dto.response.StockSummaryDto;
 import com.help.stockassistplatform.domain.stock.dto.response.StockSummaryResponse;
 import com.help.stockassistplatform.domain.stock.service.StockQueryService;
+import com.help.stockassistplatform.domain.wishlist.dto.StockPriceInfoDto;
 import com.help.stockassistplatform.global.common.IntervalResolver;
 import com.help.stockassistplatform.global.common.TimeSeriesGrouper;
 
@@ -66,5 +69,10 @@ public class StockQueryServiceImpl implements StockQueryService {
 			})
 			.toList();
 		return new StockPriceTimeSeriesResponse(timeSeries, interval);
+	}
+
+	public Optional<StockPriceInfoDto> getSummary(final String ticker) {
+		return stockPriceViewRepository.findByTicker(ticker.toUpperCase(Locale.ROOT))
+			.map(StockPriceInfoDto::from);
 	}
 }

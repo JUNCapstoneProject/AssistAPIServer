@@ -16,18 +16,18 @@ public interface StockPriceViewRepository extends JpaRepository<StockPriceView, 
 	Optional<StockPriceView> findOneByTicker(String ticker);
 
 	@Query(value = """
-		SELECT sp.ticker
-		FROM stock_vw sp
-		ORDER BY sp.market_cap DESC
-		LIMIT :limit OFFSET :offset
-	""", nativeQuery = true)
+			SELECT sp.ticker
+			FROM stock_vw sp
+			ORDER BY sp.market_cap DESC
+			LIMIT :limit OFFSET :offset
+		""", nativeQuery = true)
 	List<String> findPagedTickers(@Param("limit") int limit, @Param("offset") int offset);
 
 	@Query(value = """
-		SELECT sp.ticker
-		FROM stock_vw sp
-		ORDER BY sp.market_cap DESC
-	""", nativeQuery = true)
+			SELECT sp.ticker
+			FROM stock_vw sp
+			ORDER BY sp.market_cap DESC
+		""", nativeQuery = true)
 	List<String> findAllTickersSorted();
 
 	@Query(value = """
@@ -51,4 +51,6 @@ public interface StockPriceViewRepository extends JpaRepository<StockPriceView, 
 	);
 
 	List<StockPriceView> findByTickerIn(List<String> tickers);
+
+	Optional<StockPriceView> findByTicker(String ticker);
 }

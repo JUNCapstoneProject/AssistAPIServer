@@ -3,7 +3,6 @@ package com.help.stockassistplatform.domain.news.controller;
 import static org.springframework.data.domain.Sort.Direction.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +33,7 @@ public class NewsController {
 
 	@GetMapping("/news")
 	public ApiResponse<?> getNews(
-                @RequestParam(required = false) final List<String> category,
+		@RequestParam(required = false) final List<String> category,
 		@RequestParam(required = false) final String sentiment,
 		@RequestParam(defaultValue = "1") @Min(1L) final int page,
 		@RequestParam(defaultValue = "6") @Min(1L) final int limit,

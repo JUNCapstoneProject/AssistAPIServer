@@ -31,7 +31,7 @@ public class NewsService {
 	private final NewsRepository newsRepository;
 
 	public Slice<NewsResponseDto> getNews(
-		List<String> tags,  // ✅ 수정됨
+		List<String> tags,
 		Optional<Sentiment> sentiment,
 		Pageable pageable,
 		Lang lang
