@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.help.stockassistplatform.domain.stock.dto.response.StockPriceTimeSeriesResponse;
 import com.help.stockassistplatform.domain.stock.dto.response.StockSummaryResponse;
+import com.help.stockassistplatform.domain.wishlist.dto.StockPriceInfoDto;
 
 public interface StockQueryService {
 
@@ -26,4 +27,6 @@ public interface StockQueryService {
 	 * @return 시계열 가격 응답 DTO
 	 */
 	StockPriceTimeSeriesResponse getPriceTimeSeries(String symbol, LocalDate start, LocalDate end, String period);
+
+	StockPriceInfoDto getSummary(String ticker);
 }
