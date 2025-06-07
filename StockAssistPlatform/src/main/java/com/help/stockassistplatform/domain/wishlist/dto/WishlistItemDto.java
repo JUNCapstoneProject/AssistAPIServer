@@ -1,9 +1,9 @@
 package com.help.stockassistplatform.domain.wishlist.dto;
 
 public record WishlistItemDto(
-	String ticker,
+	String symbol,
 	String name,
-	String currentPrice,
+	String price,
 	boolean wished
 ) {
 }

@@ -6,9 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 
 public record WishlistRequestDto(
 	@NotBlank(message = "티커는 공백일 수 없습니다.")
-	String ticker
+	String symbol
 ) {
-	public String ticker() {
-		return ticker.trim().toUpperCase(Locale.ROOT);
+	public String symbol() {
+		return symbol.trim().toUpperCase(Locale.ROOT);
 	}
 }
