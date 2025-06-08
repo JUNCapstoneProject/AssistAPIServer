@@ -2,8 +2,11 @@ package com.help.stockassistplatform.domain.news.service;
 
 import static org.springframework.data.domain.Sort.Direction.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +21,9 @@ import com.help.stockassistplatform.domain.news.entity.NewsView;
 import com.help.stockassistplatform.domain.news.entity.Sentiment;
 import com.help.stockassistplatform.domain.news.exception.NewsNotFoundException;
 import com.help.stockassistplatform.domain.news.repository.NewsRepository;
+import com.help.stockassistplatform.domain.wishlist.repository.UserWishlistRepository;
 
+import io.micrometer.common.lang.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,12 +34,14 @@ import lombok.extern.slf4j.Slf4j;
 public class NewsService {
 
 	private final NewsRepository newsRepository;
+	private final UserWishlistRepository wishlistRepository;
 
 	public Slice<NewsResponseDto> getNews(
 		List<String> tags,
 		Optional<Sentiment> sentiment,
 		Pageable pageable,
-		Lang lang
+		Lang lang,
+		@Nullable UUID userId
 	) {
 		final Pageable fixed = PageRequest.of(
 			pageable.getPageNumber(),
@@ -64,6 +71,10 @@ public class NewsService {
 		if (slice.isEmpty())
 			throw new NewsNotFoundException("뉴스 결과가 존재하지 않습니다.");
 
-		return slice.map(v -> NewsResponseDto.from(v, lang));
+		final Set<String> wished = (userId == null)
+			? Set.of()
+			: new HashSet<>(wishlistRepository.findTickersByUserId(userId));
+
+		return slice.map(v -> NewsResponseDto.from(v, lang, wished));
 	}
 }
