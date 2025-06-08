@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 
 import com.help.stockassistplatform.domain.news.entity.Lang;
 import com.help.stockassistplatform.domain.news.entity.NewsView;
@@ -22,12 +23,18 @@ public class NewsResponseDto {
 	private String date;
 	private String link;
 
-	public static NewsResponseDto from(final NewsView view, final Lang lang) {
+	public static NewsResponseDto from(
+		final NewsView view,
+		final Lang lang,
+		final Set<String> wishedTickers
+	) {
 		return NewsResponseDto.builder()
 			.categories(List.of(new CategoryStatusDto(
 				view.getTag(),
 				toSentimentLabel(view.getAiAnalysis()),
-				view.getAiAnalysis())))
+				view.getAiAnalysis(),
+				wishedTickers.contains(view.getTag().toUpperCase(Locale.ROOT))
+			)))
 			.title(resolveTitle(view, lang))
 			.description(summarize(view.getContent(), 100))
 			.source(view.getOrganization())
